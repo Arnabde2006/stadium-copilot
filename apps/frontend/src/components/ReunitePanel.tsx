@@ -81,14 +81,14 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
                 value={m.name}
                 onChange={e => onUpdateMember(m.id, { name: e.target.value })}
                 placeholder="Name"
-                className="bg-slate-800/80 border border-slate-700/60 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-fifa-accent"
+                className="bg-fifa-card border border-slate-800 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#1B6E4A]"
               />
 
               {/* Member Current Location */}
               <select
                 value={m.location}
                 onChange={e => onUpdateMember(m.id, { location: e.target.value })}
-                className="bg-slate-800/80 border border-slate-700/60 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-fifa-accent"
+                className="bg-fifa-card border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-[#1B6E4A]"
               >
                 {nodeOptions.map(opt => (
                   <option key={opt.id} value={opt.id}>
@@ -101,7 +101,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
               <select
                 value={m.locale || 'en'}
                 onChange={e => onUpdateMember(m.id, { locale: e.target.value })}
-                className="bg-slate-800/80 border border-slate-700/60 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-fifa-accent"
+                className="bg-fifa-card border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-[#1B6E4A]"
               >
                 {locales.map(l => (
                   <option key={l.code} value={l.code}>
@@ -123,10 +123,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
             Add Group Member
           </button>
         )}
-      </div>
 
-      {/* CTA Button Block */}
-      <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/85 flex-shrink-0">
         {error && (
           <div className="text-[11px] text-red-400 bg-red-950/20 border border-red-500/20 px-3 py-2 rounded">
             {error}
@@ -137,7 +134,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
           type="button"
           disabled={isLoading}
           onClick={() => onFindMeetup(accessibilityMode)}
-          className="w-full bg-fifa-blue hover:bg-fifa-accent text-white py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5 select-none"
+          className="w-full bg-[#1B6E4A] hover:bg-[#228557] text-[#E8E6E0] py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5 select-none"
         >
           {isLoading ? (
             <>

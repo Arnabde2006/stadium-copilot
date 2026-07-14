@@ -20,7 +20,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
     <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-4 w-full`}>
       <div className="flex gap-2 max-w-[85%] sm:max-w-[75%]">
         {isBot && (
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-fifa-blue to-fifa-accent flex items-center justify-center text-sm shadow-md border border-fifa-gold/25 select-none flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-fifa-card flex items-center justify-center text-sm shadow-md border border-fifa-gold/25 select-none flex-shrink-0">
             🤖
           </div>
         )}
@@ -36,7 +36,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
             className={`rounded-2xl px-4 py-3 text-base shadow-md leading-relaxed ${
               isBot
                 ? 'bg-fifa-card text-[#E8E6E0] border border-slate-850/60 rounded-tl-none font-medium'
-                : 'bg-fifa-blue text-[#E8E6E0] rounded-tr-none font-medium'
+                : 'bg-[#1B6E4A] text-[#E8E6E0] rounded-tr-none font-medium'
             }`}
           >
             <p className="whitespace-pre-wrap">{message.text}</p>

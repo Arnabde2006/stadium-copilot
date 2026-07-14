@@ -30,9 +30,9 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     const cx = 250;
     const cy = 250;
     
-    const R1 = 100; // Ring 1: Seating sections
-    const R2 = 160; // Ring 2: Food stalls & restrooms
-    const R3 = 220; // Ring 3: Gates & exits
+    const R1 = 90; // Ring 1: Seating sections (descaled to prevent label clipping)
+    const R2 = 140; // Ring 2: Food stalls & restrooms (descaled)
+    const R3 = 195; // Ring 3: Gates & exits (descaled)
     
     const calcCoords = (radius: number, index: number, total: number, angleOffsetDeg: number) => {
       const angleRad = ((index * (360 / total) + angleOffsetDeg) * Math.PI) / 180;
@@ -74,7 +74,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     const dy = node.y - 250;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle = Math.atan2(dy, dx);
-    const offset = 24; // Push outward by 24px
+    const offset = 20; // Push outward by 20px (descaled to prevent clipping)
     
     return {
       x: Math.round(250 + (distance + offset) * Math.cos(angle)),
@@ -280,7 +280,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
   };
 
   return (
-    <div className="relative w-full bg-fifa-navy border border-slate-800/80 rounded-xl p-4 shadow-inner flex flex-col items-center">
+    <div className="relative w-full flex-1 min-h-0 bg-fifa-navy border border-slate-800/80 rounded-xl p-4 shadow-inner flex flex-col items-center overflow-hidden">
       {/* SVG Path Animations */}
       <svg className="hidden">
         <defs>
@@ -318,8 +318,8 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
         <span className="text-fifa-gold font-display text-[9px] uppercase tracking-wider font-semibold">Click node to change Start Position</span>
       </div>
 
-      <div className="w-full overflow-auto flex justify-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-900/60">
-        <svg viewBox="0 0 500 500" className="w-full max-w-[450px] aspect-square">
+      <div className="w-full flex-1 min-h-0 flex justify-center items-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-900/60 overflow-hidden">
+        <svg viewBox="0 0 500 500" className="h-full w-auto max-w-full aspect-square">
           {/* Turf Green Soccer Pitch Center Field (Precisely Centered) */}
           {/* Outer Boundary */}
           <rect x={185} y={205} width={130} height={90} fill="#228557" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />

@@ -162,13 +162,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           onChange={e => setInputValue(e.target.value)}
           placeholder={isListening ? 'Listening to speech...' : 'Type or ask a question...'}
           disabled={isListening}
-          className="flex-1 bg-slate-800/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-fifa-accent focus:ring-1 focus:ring-fifa-accent/30 disabled:opacity-50"
+          className="flex-1 bg-fifa-card border border-slate-800 rounded-xl px-4 py-2.5 text-base text-[#E8E6E0] placeholder-slate-500 focus:outline-none focus:border-[#1B6E4A] disabled:opacity-50 font-normal"
         />
 
         <button
           type="submit"
           disabled={!inputValue.trim() || isLoading}
-          className="p-2.5 rounded-xl bg-fifa-blue hover:bg-fifa-accent text-white flex-shrink-0 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+          className="p-2.5 rounded-xl bg-[#1B6E4A] hover:bg-[#228557] text-[#E8E6E0] flex-shrink-0 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
         >
           <PaperAirplaneIcon className="h-4.5 w-4.5" />
         </button>
