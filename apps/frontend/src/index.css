@@ -4,36 +4,52 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Premium styling overrides */
+/* Layered Elevation System and desaturated custom properties */
+:root {
+  --surface-base: #0B0F19;
+  --surface-panel: #121826;
+  --surface-card: #1B2236;
+  --surface-elevated: #242D47;
+  
+  --fifa-clear: #228557;
+  --fifa-moderate: #D99B26;
+  --fifa-congested: #C93B3B;
+  
+  --text-primary: #E8E6E0;
+  --text-secondary: #94A3B8;
+}
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0A0F1A;
-  background-image: radial-gradient(circle at center, #151C2C 0%, #0A0F1A 100%);
-  color: #F4F1EA;
+  background-color: var(--surface-base);
+  background-image: radial-gradient(circle at center, var(--surface-panel) 0%, var(--surface-base) 100%);
+  color: var(--text-primary);
   overflow: hidden;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(10, 15, 26, 0.5);
+  background: var(--surface-base);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(27, 110, 74, 0.25);
+  background: rgba(34, 133, 87, 0.35);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(27, 110, 74, 0.45);
+  background: rgba(34, 133, 87, 0.55);
 }
 
 /* Typography styles */
@@ -68,6 +84,56 @@ body {
   }
 }
 
+/* Visible focus outlines for keyboard accessibility */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="switch"]:focus-visible,
+svg *:focus-visible {
+  outline: 2.5px solid var(--fifa-clear, #228557) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(34, 133, 87, 0.25) !important;
+}
+
+/* Help highlight keyboard navigation focus states on the map nodes */
+svg *:focus-visible {
+  outline-offset: 1px !important;
+}
+
+/* prefers-reduced-motion media query overrides */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+  
+  .animate-marquee {
+    animation: none !important;
+    white-space: normal !important;
+    width: auto !important;
+    transform: none !important;
+  }
+  
+  .animate-ping {
+    animation: none !important;
+    opacity: 0.45 !important;
+  }
+  
+  .animate-pulse,
+  .animate-pulse-fast,
+  .animate-bounce {
+    animation: none !important;
+  }
+}
+
 /* Helper transitions */
 .fade-enter {
   opacity: 0;
@@ -76,4 +142,5 @@ body {
   opacity: 1;
   transition: opacity 200ms ease-in-out;
 }
+
 

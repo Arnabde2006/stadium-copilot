@@ -115,10 +115,17 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
   // Get color coding based on density
   const getDensityColor = (nodeId: string) => {
     const data = densities.find(d => d.nodeId === nodeId);
-    if (!data) return '#1B6E4A'; // default clear turf-green
-    if (data.level === 'high') return '#E23B3B'; // congested red
-    if (data.level === 'medium') return '#F2B441'; // moderate gold
-    return '#1B6E4A'; // clear turf-green
+    if (!data) return '#228557'; // default clear turf-green
+    if (data.level === 'high') return '#C93B3B'; // congested red
+    if (data.level === 'medium') return '#D99B26'; // moderate gold
+    return '#228557'; // clear turf-green
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, nodeId: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelectStartLocation(nodeId);
+    }
   };
 
   // Node symbols or styles depending on node type
@@ -128,16 +135,21 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     const isEnd = suggestedPath.length > 0 && node.id === suggestedPath[suggestedPath.length - 1];
     const isPathNode = isNodeInPath(node.id);
 
+    // Apply colorblind-safe diagonal hatch pattern for congested nodes
+    const data = densities.find(d => d.nodeId === node.id);
+    const isCongested = data?.level === 'high';
+    const nodeFill = isCongested ? 'url(#hatch-congested)' : color;
+
     // Dynamic ring stroke styling for active route (No default blue)
     const ringStyle = isStart
-      ? 'stroke-[#F2B441] stroke-[3] animate-pulse'
+      ? 'stroke-[#D99B26] stroke-[3] animate-pulse'
       : isEnd
-      ? 'stroke-[#1B6E4A] stroke-[3] animate-bounce'
+      ? 'stroke-[#228557] stroke-[3] animate-bounce'
       : isPathNode
       ? 'stroke-white stroke-[1.5]'
       : 'stroke-slate-700/60 stroke-[1]';
 
-    const hoverStyle = 'cursor-pointer hover:scale-115 hover:brightness-125 hover:stroke-white hover:stroke-[2] font-semibold';
+    const hoverStyle = 'cursor-pointer hover:scale-115 hover:brightness-125 hover:stroke-white hover:stroke-[2] font-semibold outline-none';
 
     switch (node.type) {
       case 'gate':
@@ -148,8 +160,12 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             width={24}
             height={24}
             rx={4}
-            fill={color}
+            fill={nodeFill}
+            stroke={isCongested ? '#C93B3B' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
+            tabIndex={0}
+            aria-label={`Gate ${node.name}`}
+            onKeyDown={(e) => handleKeyDown(e, node.id)}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -157,8 +173,12 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
         return (
           <polygon
             points={`${node.x},${node.y - 14} ${node.x + 14},${node.y} ${node.x},${node.y + 14} ${node.x - 14},${node.y}`}
-            fill={color}
+            fill={nodeFill}
+            stroke={isCongested ? '#C93B3B' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
+            tabIndex={0}
+            aria-label={`Exit ${node.name}`}
+            onKeyDown={(e) => handleKeyDown(e, node.id)}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -168,8 +188,12 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             cx={node.x}
             cy={node.y}
             r={10}
-            fill={color}
+            fill={nodeFill}
+            stroke={isCongested ? '#C93B3B' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
+            tabIndex={0}
+            aria-label={`Restroom ${node.name}`}
+            onKeyDown={(e) => handleKeyDown(e, node.id)}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -179,8 +203,12 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             cx={node.x}
             cy={node.y}
             r={11}
-            fill={color}
+            fill={nodeFill}
+            stroke={isCongested ? '#C93B3B' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
+            tabIndex={0}
+            aria-label={`Food Stall ${node.name}`}
+            onKeyDown={(e) => handleKeyDown(e, node.id)}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -192,12 +220,63 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             width={30}
             height={20}
             rx={3}
-            fill={color}
+            fill={nodeFill}
+            stroke={isCongested ? '#C93B3B' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
+            tabIndex={0}
+            aria-label={`Section ${node.name}`}
+            onKeyDown={(e) => handleKeyDown(e, node.id)}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
     }
+  };
+
+  const renderCongestionBadge = (node: StadiumNode) => {
+    const data = densities.find(d => d.nodeId === node.id);
+    const level = data ? data.level : 'low';
+    
+    let badgeX = node.x + 11;
+    let badgeY = node.y - 11;
+    if (node.type === 'section') {
+      badgeX = node.x + 15;
+      badgeY = node.y - 10;
+    } else if (node.type === 'gate' || node.type === 'exit') {
+      badgeX = node.x + 12;
+      badgeY = node.y - 12;
+    }
+    
+    let symbol = '✓';
+    let badgeBg = '#228557'; // Turf Green Clear
+    if (level === 'medium') {
+      symbol = '▲';
+      badgeBg = '#D99B26'; // Gold
+    } else if (level === 'high') {
+      symbol = '⚠';
+      badgeBg = '#C93B3B'; // Red
+    }
+    
+    return (
+      <g className="select-none pointer-events-none">
+        <circle
+          cx={badgeX}
+          cy={badgeY}
+          r={6.5}
+          fill={badgeBg}
+          stroke="#121826"
+          strokeWidth={1}
+        />
+        <text
+          x={badgeX}
+          y={badgeY + 2}
+          textAnchor="middle"
+          fill="#E8E6E0"
+          className="font-sans font-bold text-[6.5px]"
+        >
+          {symbol}
+        </text>
+      </g>
+    );
   };
 
   return (
@@ -216,14 +295,25 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
               animation: march 1s linear infinite;
             }
           `}</style>
+          {/* Colorblind-Safe Diagonal Hatching Pattern for Congested Zones */}
+          <pattern id="hatch-congested" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+            <rect width="10" height="10" fill="#C93B3B" fillOpacity="0.25" />
+            <line x1="0" y1="0" x2="0" y2="10" stroke="#C93B3B" strokeWidth="2.5" />
+          </pattern>
         </defs>
       </svg>
 
-      <div className="w-full flex justify-between items-center text-[10px] sm:text-xs text-slate-400 mb-3 px-1">
-        <span className="flex items-center gap-1.5 font-display text-[9px] tracking-wider uppercase text-slate-400">
-          <span className="inline-block w-2.5 h-2.5 bg-fifa-clear rounded-sm"></span> Clear
-          <span className="inline-block w-2.5 h-2.5 bg-fifa-moderate rounded-sm ml-1"></span> Moderate
-          <span className="inline-block w-2.5 h-2.5 bg-fifa-congested rounded-sm ml-1"></span> Congested
+      <div className="w-full flex justify-between items-center text-[10px] sm:text-xs text-slate-400 mb-3 px-1 select-none">
+        <span className="flex items-center gap-2 font-display text-[9px] tracking-wider uppercase text-slate-400">
+          <span className="flex items-center gap-1">
+            <span className="flex items-center justify-center w-3.5 h-3.5 bg-fifa-clear text-[7.5px] text-white font-bold rounded-sm">✓</span> Clear
+          </span>
+          <span className="flex items-center gap-1 ml-1.5">
+            <span className="flex items-center justify-center w-3.5 h-3.5 bg-fifa-moderate text-[7.5px] text-white font-bold rounded-sm">▲</span> Moderate
+          </span>
+          <span className="flex items-center gap-1 ml-1.5">
+            <span className="flex items-center justify-center w-3.5 h-3.5 bg-fifa-congested text-[7.5px] text-white font-bold rounded-sm">⚠</span> Congested
+          </span>
         </span>
         <span className="text-fifa-gold font-display text-[9px] uppercase tracking-wider font-semibold">Click node to change Start Position</span>
       </div>
@@ -232,7 +322,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
         <svg viewBox="0 0 500 500" className="w-full max-w-[450px] aspect-square">
           {/* Turf Green Soccer Pitch Center Field (Precisely Centered) */}
           {/* Outer Boundary */}
-          <rect x={185} y={205} width={130} height={90} fill="#1B6E4A" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />
+          <rect x={185} y={205} width={130} height={90} fill="#228557" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />
           {/* Center Circle & Line */}
           <circle cx={250} cy={250} r={20} fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
           <line x1={250} y1={205} x2={250} y2={295} stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
@@ -300,7 +390,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     y1={fromNode.y}
                     x2={toNode.x}
                     y2={toNode.y}
-                    stroke="#F2B441"
+                    stroke="#D99B26"
                     strokeWidth="6"
                     strokeLinecap="round"
                     className="opacity-40 blur-[2px]"
@@ -311,7 +401,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                   y1={fromNode.y}
                   x2={toNode.x}
                   y2={toNode.y}
-                  stroke={activePath ? '#F2B441' : '#475569'}
+                  stroke={activePath ? '#D99B26' : '#475569'}
                   strokeWidth={activePath ? 3.5 : 1.5}
                   strokeLinecap="round"
                   className={activePath ? 'marching-ants' : 'opacity-25'}
@@ -335,7 +425,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     cy={node.y}
                     r={isMeetupPoint ? 20 : isStart ? 18 : 15}
                     fill="none"
-                    stroke={isMeetupPoint ? '#F2B441' : isStart ? '#F2B441' : '#1B6E4A'}
+                    stroke={isMeetupPoint ? '#D99B26' : isStart ? '#D99B26' : '#228557'}
                     strokeWidth={isMeetupPoint ? 3.5 : 2.5}
                     className="animate-ping opacity-75"
                   />
@@ -343,6 +433,9 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
 
                 {/* Node Shape */}
                 {renderNodeShape(node)}
+
+                {/* Colorblind-Safe Congestion Badge */}
+                {renderCongestionBadge(node)}
 
                 {/* Node Text Label (Shifted radially outward for clear readability) */}
                 <text

@@ -170,7 +170,7 @@ export const StaffPanel: React.FC = () => {
             onChange={e => setInputValue(e.target.value)}
             placeholder={isListening ? 'Listening to speech...' : 'E.g., Spill near Section 104 restroom...'}
             disabled={isListening || isLoading}
-            className="flex-1 bg-slate-800/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-fifa-accent focus:ring-1 focus:ring-fifa-accent/30 disabled:opacity-50"
+            className="flex-1 bg-fifa-card border border-slate-800/80 rounded-xl px-4 py-2.5 text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-fifa-accent disabled:opacity-50 font-normal"
           />
 
           <button
@@ -188,8 +188,8 @@ export const StaffPanel: React.FC = () => {
       </form>
 
       {/* Incident list */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        <div className="flex items-center justify-between mb-1">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex items-center justify-between mb-1 select-none">
           <h3 className="font-display text-xs font-bold text-slate-400 uppercase tracking-widest">Live Incident Feed</h3>
           <span className="text-[10px] text-slate-500 font-medium">Total: {incidents.length}</span>
         </div>
@@ -204,7 +204,7 @@ export const StaffPanel: React.FC = () => {
           incidents.map(inc => (
             <div 
               key={inc.id} 
-              className="bg-slate-800/35 border border-slate-700/30 rounded-xl p-3.5 hover:bg-slate-800/50 hover:border-slate-700/60 transition-all shadow-sm flex flex-col gap-2.5"
+              className="bg-fifa-card border border-slate-800/80 rounded-xl p-4 hover:bg-slate-800/25 hover:border-slate-800 transition-all shadow-sm flex flex-col gap-2.5"
             >
               {/* Category, Urgency, Timestamp Header */}
               <div className="flex items-center justify-between">
@@ -232,7 +232,7 @@ export const StaffPanel: React.FC = () => {
               </div>
 
               {/* Summary */}
-              <p className="text-xs text-slate-200 leading-relaxed font-normal">
+              <p className="text-base text-[#E8E6E0] leading-relaxed font-normal bg-fifa-dark/30 p-2.5 rounded border border-slate-850/50">
                 {inc.summary}
               </p>
             </div>

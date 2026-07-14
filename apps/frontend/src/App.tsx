@@ -72,8 +72,8 @@ export const App: React.FC = () => {
       {/* Dynamic Alerts Banner */}
       <CrowdAlertBanner densities={densities} nodes={nodes} />
 
-      {/* Selector Toolbar */}
-      <div className="bg-fifa-navy/40 px-4 py-2.5 border-b border-slate-800/60 flex flex-wrap gap-3 items-center justify-between flex-shrink-0 text-xs text-slate-300">
+      {/* Selector Toolbar (Aligned to 8px Spacing Grid) */}
+      <div className="bg-fifa-navy/40 px-4 py-2 border-b border-slate-800/60 flex flex-wrap gap-4 items-center justify-between flex-shrink-0 text-xs text-slate-300">
         <div className="flex flex-wrap items-center gap-4">
           {/* Desktop Mode Switcher */}
           <div className="flex items-center gap-5 select-none">

@@ -33,10 +33,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
           )}
 
           <div
-            className={`rounded-2xl px-4 py-2.5 text-sm shadow-md leading-relaxed ${
+            className={`rounded-2xl px-4 py-3 text-base shadow-md leading-relaxed ${
               isBot
-                ? 'bg-fifa-navy text-slate-200 border border-slate-700/30 rounded-tl-none'
-                : 'bg-fifa-blue text-white rounded-tr-none'
+                ? 'bg-fifa-card text-[#E8E6E0] border border-slate-850/60 rounded-tl-none font-medium'
+                : 'bg-fifa-blue text-[#E8E6E0] rounded-tr-none font-medium'
             }`}
           >
             <p className="whitespace-pre-wrap">{message.text}</p>
