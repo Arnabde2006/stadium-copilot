@@ -7,11 +7,17 @@ export const useVoiceInput = (onTranscript: (text: string) => void) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const onTranscriptRef = useRef(onTranscript);
+  const isListeningRef = useRef(false);
 
   // Keep callback ref fresh to avoid restarting listeners on handler changes
   useEffect(() => {
     onTranscriptRef.current = onTranscript;
   }, [onTranscript]);
+
+  // Keep isListeningRef in sync with state
+  useEffect(() => {
+    isListeningRef.current = isListening;
+  }, [isListening]);
 
   const initRecognition = useCallback(() => {
     if (!SpeechRecognition) return;
@@ -42,20 +48,20 @@ export const useVoiceInput = (onTranscript: (text: string) => void) => {
     };
 
     rec.onend = () => {
-      // If we are still supposed to be listening (not manually stopped), restart!
-      if (recognitionRef.current && isListening) {
-        try {
-          recognitionRef.current.start();
-        } catch (err) {
-          console.error('Failed to restart speech recognition:', err);
+        // If we are still supposed to be listening (not manually stopped), restart!
+        if (recognitionRef.current && isListeningRef.current) {
+          try {
+            recognitionRef.current.start();
+          } catch (err) {
+            console.error('Failed to restart speech recognition:', err);
+          }
+        } else {
+          setIsListening(false);
         }
-      } else {
-        setIsListening(false);
-      }
-    };
+      };
 
     recognitionRef.current = rec;
-  }, [SpeechRecognition, isListening]);
+  }, [SpeechRecognition]);
 
   useEffect(() => {
     initRecognition();
