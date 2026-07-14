@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Message, StadiumNode } from '../types';
 import MessageBubble from './MessageBubble';
 import { PaperAirplaneIcon, MicrophoneIcon } from '@heroicons/react/24/solid';
+import { ChatBubbleLeftEllipsisIcon } from '@heroicons/react/24/outline';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -80,11 +81,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   }, [messages, isLoading]);
 
   const chips = [
-    { text: 'Where is the nearest restroom?', label: '🚻 Find Restroom' },
-    { text: '¿Dónde está el baño?', label: '🇪🇸 ¿Dónde está el baño?' },
-    { text: 'How do I get to Gate C?', label: '🚪 Route to Gate C' },
-    { text: 'Find Taco Corner', label: '🌮 Taco Stall' },
-    { text: 'Où est la sortie ouest?', label: '🇫🇷 Sortie Ouest' },
+    { label: 'Section 103 Route', text: 'Show me the fastest route to Section 103' },
+    { label: 'Restrooms & Food near Section 102', text: 'Where is the nearest food and restroom to Section 102?' },
+    { label: 'Step-Free Gate A Route', text: 'Step-free route from Gate A to Section 104' },
+    { label: 'Noise alert zones', text: 'Which areas are currently loud or congested?' },
   ];
 
   return (
@@ -132,9 +132,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             <button
               key={`chip-${index}`}
               onClick={() => onSendMessage(c.text)}
-              className="text-[10px] font-semibold px-2.5 py-1.5 rounded-full bg-transparent hover:bg-fifa-clear/10 text-slate-300 hover:text-white border border-slate-700 hover:border-fifa-clear/40 transition-all select-none"
+              className="text-[10px] font-semibold px-2.5 py-1.5 rounded-full bg-transparent hover:bg-fifa-clear/10 text-slate-300 hover:text-white border border-slate-700 hover:border-fifa-clear/40 transition-all select-none flex items-center gap-1.5"
             >
-              {c.label}
+              <ChatBubbleLeftEllipsisIcon className="h-3.5 w-3.5 text-fifa-gold flex-shrink-0" />
+              <span>{c.label}</span>
             </button>
           ))}
         </div>

@@ -31,7 +31,7 @@ export const CrowdAlertBanner: React.FC<CrowdAlertBannerProps> = ({ densities, n
       </div>
       <div className="flex-1 overflow-hidden relative select-none">
         <div className="inline-block text-xs sm:text-sm text-fifa-gold tracking-widest whitespace-nowrap animate-marquee">
-          HEAVILY CONGESTED AREAS: {names.toUpperCase()} • REROUTING TRAFFIC TO AVOID THESE SECTORS • PLEASE FOLLOW SIGNS
+          HEAVILY CONGESTED AREAS: {names.toUpperCase()} :: REROUTING TRAFFIC TO AVOID THESE SECTORS :: PLEASE FOLLOW SIGNS
         </div>
       </div>
     </div>

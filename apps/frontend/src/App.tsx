@@ -7,6 +7,7 @@ import CrowdAlertBanner from './components/CrowdAlertBanner';
 import AccessibilityToggle from './components/AccessibilityToggle';
 import ReunitePanel from './components/ReunitePanel';
 import StaffPanel from './components/StaffPanel';
+import RouteSummary from './components/RouteSummary';
 import { ChatBubbleLeftRightIcon, MapIcon, TrashIcon, UserGroupIcon, ShieldExclamationIcon } from '@heroicons/react/24/outline';
 
 export const App: React.FC = () => {
@@ -16,6 +17,7 @@ export const App: React.FC = () => {
     edges,
     densities,
     suggestedPath,
+    congestionAlert,
     userLocation,
     setUserLocation,
     accessibilityMode,
@@ -45,7 +47,12 @@ export const App: React.FC = () => {
       {/* Top Header Navigation */}
       <header className="bg-fifa-navy border-b border-slate-800/80 px-4 py-3 flex items-center justify-between flex-shrink-0 z-10 shadow-md">
         <div className="flex items-center gap-2.5">
-          <span className="text-xl">🏟️</span>
+          {/* Stylized Vector Stadium Logo */}
+          <svg viewBox="0 0 100 100" className="h-5.5 w-5.5 text-fifa-gold flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round">
+            <ellipse cx="50" cy="50" rx="42" ry="26" />
+            <ellipse cx="50" cy="50" rx="26" ry="15" strokeDasharray="6 4" strokeWidth="4" />
+            <circle cx="50" cy="50" r="5" fill="currentColor" />
+          </svg>
           <div>
             <h1 className="text-base font-bold tracking-widest uppercase text-white font-display">Stadium Copilot</h1>
             <p className="text-[10px] text-fifa-gold font-semibold tracking-widest uppercase font-display">FIFA World Cup 2026</p>
@@ -92,13 +99,16 @@ export const App: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('staff')}
-              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 ${
+              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 flex items-center gap-1.5 ${
                 activeTab === 'staff'
-                  ? 'border-amber-500 text-amber-400'
-                  : 'border-transparent text-amber-500/60 hover:text-amber-400'
+                  ? 'border-fifa-clear text-slate-100'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              🛡️ Staff
+              <span>🛡️ Staff</span>
+              <span className="text-[7.5px] font-sans bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded px-1 font-bold">
+                OPS
+              </span>
             </button>
           </div>
 
@@ -198,6 +208,13 @@ export const App: React.FC = () => {
             activeTab === 'map' ? 'flex' : 'hidden md:flex'
           }`}
         >
+          <RouteSummary
+            suggestedPath={activeTab === 'reunite' ? [] : suggestedPath}
+            congestionAlert={congestionAlert}
+            nodes={nodes}
+            edges={edges}
+            reuniteResult={activeTab === 'reunite' ? reuniteResult : null}
+          />
           <StadiumMap
             nodes={nodes}
             edges={edges}

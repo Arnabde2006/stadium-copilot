@@ -20,45 +20,67 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
   onSelectStartLocation,
   reuniteResult = null
 }) => {
-  // Map node coordinates to a concentric radial stadium layout
+  // Define ring groupings
+  const RING1_NODES = ['sec-100', 'sec-101', 'sec-102', 'sec-103', 'sec-104', 'sec-105'];
+  const RING2_NODES = ['food-stall-a', 'restroom-2', 'food-stall-b', 'restroom-3', 'food-stall-c', 'restroom-1'];
+  const RING3_NODES = ['exit-east', 'gate-c', 'gate-d', 'exit-west', 'gate-a', 'gate-b'];
+
+  // Programmatically calculate node coordinates for concentric circular rings
   const getCustomNodeCoords = (nodeId: string): { x: number; y: number } => {
     const cx = 250;
     const cy = 250;
     
-    switch (nodeId) {
-      // Ring 1 (Sections, Radius 105)
-      case 'sec-100': return { x: cx, y: cy - 105 }; // -90 deg
-      case 'sec-101': return { x: cx + 91, y: cy - 53 }; // -30 deg
-      case 'sec-102': return { x: cx + 91, y: cy + 53 }; // 30 deg
-      case 'sec-103': return { x: cx, y: cy + 105 }; // 90 deg
-      case 'sec-104': return { x: cx - 91, y: cy + 53 }; // 150 deg
-      case 'sec-105': return { x: cx - 91, y: cy - 53 }; // 210 deg
+    const R1 = 100; // Ring 1: Seating sections
+    const R2 = 160; // Ring 2: Food stalls & restrooms
+    const R3 = 220; // Ring 3: Gates & exits
+    
+    const calcCoords = (radius: number, index: number, total: number, angleOffsetDeg: number) => {
+      const angleRad = ((index * (360 / total) + angleOffsetDeg) * Math.PI) / 180;
+      return {
+        x: Math.round(cx + radius * Math.cos(angleRad)),
+        y: Math.round(cy + radius * Math.sin(angleRad))
+      };
+    };
 
-      // Ring 2 (Food/Restrooms, Radius 165)
-      case 'food-stall-a': return { x: cx, y: cy - 165 }; // -90 deg
-      case 'restroom-2':   return { x: cx + 143, y: cy - 83 }; // -30 deg
-      case 'food-stall-b': return { x: cx + 143, y: cy + 83 }; // 30 deg
-      case 'restroom-3':   return { x: cx, y: cy + 165 }; // 90 deg
-      case 'food-stall-c': return { x: cx - 143, y: cy + 83 }; // 150 deg
-      case 'restroom-1':   return { x: cx - 143, y: cy - 83 }; // 210 deg
-
-      // Ring 3 (Gates/Exits, Radius 225)
-      case 'exit-east': return { x: cx + 225, y: cy }; // 0 deg
-      case 'gate-c':    return { x: cx + 113, y: cy + 195 }; // 60 deg
-      case 'gate-d':    return { x: cx - 113, y: cy + 195 }; // 120 deg
-      case 'exit-west': return { x: cx - 225, y: cy }; // 180 deg
-      case 'gate-a':    return { x: cx - 113, y: cy - 195 }; // 240 deg
-      case 'gate-b':    return { x: cx + 113, y: cy - 195 }; // 300 deg
-
-      default:
-        return { x: cx, y: cy };
+    const idx1 = RING1_NODES.indexOf(nodeId);
+    if (idx1 !== -1) {
+      return calcCoords(R1, idx1, RING1_NODES.length, -90);
     }
+
+    const idx2 = RING2_NODES.indexOf(nodeId);
+    if (idx2 !== -1) {
+      return calcCoords(R2, idx2, RING2_NODES.length, -90);
+    }
+
+    const idx3 = RING3_NODES.indexOf(nodeId);
+    if (idx3 !== -1) {
+      return calcCoords(R3, idx3, RING3_NODES.length, 0);
+    }
+
+    return { x: cx, y: cy };
   };
 
   const mappedNodes = nodes.map(n => ({
     ...n,
     ...getCustomNodeCoords(n.id)
   }));
+
+  // Helper to push text labels radially outward from node positions to avoid overlapping edges
+  const getLabelCoords = (node: StadiumNode): { x: number; y: number } => {
+    if (node.type === 'section') {
+      return { x: node.x, y: node.y + 3 }; // Centered inside section box
+    }
+    const dx = node.x - 250;
+    const dy = node.y - 250;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    const offset = 24; // Push outward by 24px
+    
+    return {
+      x: Math.round(250 + (distance + offset) * Math.cos(angle)),
+      y: Math.round(250 + (distance + offset) * Math.sin(angle) + 3)
+    };
+  };
 
   // Utility: Check if a node is in the suggested path
   const isNodeInPath = (nodeId: string) => suggestedPath.includes(nodeId);
@@ -88,7 +110,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     return false;
   };
 
-  const memberColors = ['#F2B441', '#3B82F6', '#8B5CF6', '#EC4899']; // Gold, Blue, Purple, Pink
+  const memberColors = ['#F2B441', '#F4F1EA', '#8B5CF6', '#EC4899']; // Gold, Chalk White, Purple, Pink
 
   // Get color coding based on density
   const getDensityColor = (nodeId: string) => {
@@ -106,14 +128,16 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     const isEnd = suggestedPath.length > 0 && node.id === suggestedPath[suggestedPath.length - 1];
     const isPathNode = isNodeInPath(node.id);
 
-    // Dynamic ring stroke styling for active route
+    // Dynamic ring stroke styling for active route (No default blue)
     const ringStyle = isStart
       ? 'stroke-[#F2B441] stroke-[3] animate-pulse'
       : isEnd
-      ? 'stroke-blue-400 stroke-[3] animate-bounce'
+      ? 'stroke-[#1B6E4A] stroke-[3] animate-bounce'
       : isPathNode
       ? 'stroke-white stroke-[1.5]'
       : 'stroke-slate-700/60 stroke-[1]';
+
+    const hoverStyle = 'cursor-pointer hover:scale-115 hover:brightness-125 hover:stroke-white hover:stroke-[2] font-semibold';
 
     switch (node.type) {
       case 'gate':
@@ -125,7 +149,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             height={24}
             rx={4}
             fill={color}
-            className={`cursor-pointer transition-all duration-300 ${ringStyle} hover:scale-125`}
+            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -134,7 +158,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
           <polygon
             points={`${node.x},${node.y - 14} ${node.x + 14},${node.y} ${node.x},${node.y + 14} ${node.x - 14},${node.y}`}
             fill={color}
-            className={`cursor-pointer transition-all duration-300 ${ringStyle} hover:scale-125`}
+            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -145,7 +169,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             cy={node.y}
             r={10}
             fill={color}
-            className={`cursor-pointer transition-all duration-300 ${ringStyle} hover:scale-125`}
+            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -156,7 +180,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             cy={node.y}
             r={11}
             fill={color}
-            className={`cursor-pointer transition-all duration-300 ${ringStyle} hover:scale-125`}
+            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -169,7 +193,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             height={20}
             rx={3}
             fill={color}
-            className={`cursor-pointer transition-all duration-300 ${ringStyle} hover:scale-125`}
+            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             onClick={() => onSelectStartLocation(node.id)}
           />
         );
@@ -206,7 +230,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
 
       <div className="w-full overflow-auto flex justify-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-900/60">
         <svg viewBox="0 0 500 500" className="w-full max-w-[450px] aspect-square">
-          {/* Turf Green Soccer Pitch Center Field */}
+          {/* Turf Green Soccer Pitch Center Field (Precisely Centered) */}
           {/* Outer Boundary */}
           <rect x={185} y={205} width={130} height={90} fill="#1B6E4A" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />
           {/* Center Circle & Line */}
@@ -311,7 +335,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     cy={node.y}
                     r={isMeetupPoint ? 20 : isStart ? 18 : 15}
                     fill="none"
-                    stroke={isMeetupPoint ? '#F2B441' : isStart ? '#F2B441' : '#3B82F6'}
+                    stroke={isMeetupPoint ? '#F2B441' : isStart ? '#F2B441' : '#1B6E4A'}
                     strokeWidth={isMeetupPoint ? 3.5 : 2.5}
                     className="animate-ping opacity-75"
                   />
@@ -320,15 +344,16 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                 {/* Node Shape */}
                 {renderNodeShape(node)}
 
-                {/* Node Text Label */}
+                {/* Node Text Label (Shifted radially outward for clear readability) */}
                 <text
-                  x={node.x}
-                  y={node.type === 'section' ? node.y + 4 : node.y + 18}
+                  x={getLabelCoords(node).x}
+                  y={getLabelCoords(node).y}
                   textAnchor="middle"
                   fill={node.type === 'section' ? '#F4F1EA' : '#8B93A7'}
                   className={`select-none pointer-events-none font-display uppercase font-bold tracking-wider ${
                     node.type === 'section' ? 'text-[9px]' : 'text-[7.5px]'
                   }`}
+                  style={{ textShadow: '0 1px 2px rgba(10, 15, 26, 0.95), 0 0 1px rgba(10, 15, 26, 0.95)' }}
                 >
                   {node.type === 'section' ? node.name.replace('Section ', '') : node.name.split(' (')[0]}
                 </text>

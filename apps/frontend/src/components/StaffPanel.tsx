@@ -108,7 +108,7 @@ export const StaffPanel: React.FC = () => {
       case 'security':
         return <ShieldExclamationIcon className="h-5 w-5 text-amber-400" />;
       case 'crowding':
-        return <UsersIcon className="h-5 w-5 text-blue-400" />;
+        return <UsersIcon className="h-5 w-5 text-fifa-gold" />;
       case 'facility':
         return <WrenchScrewdriverIcon className="h-5 w-5 text-teal-400" />;
       default:
