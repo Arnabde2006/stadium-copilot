@@ -74,6 +74,22 @@ Honesty and clear boundaries are crucial for a solid MVP:
     *   **Web Speech API**: Real microphone speech input inside the browser translating speak query to text.
     *   **Responsive Client**: A mobile-first UI with tab navigation that transforms into a split-screen dashboard on desktop view.
     *   **Offline Mode**: If no `GEMINI_API_KEY` is provided, a mock LLM heuristic service intercepts queries and routes to allow immediate layout and UI testing.
+    *   **Staff Operations Logging**: An internal dashboard converting free-text or voice-transcribed logs into structured operational tickets (categorized, prioritized, and summarized).
+*   **Mocked / Simulated**:
+    *   **Incident Dispatch & Routing**: Incident routing, push alerts, and physical dispatching of emergency personnel or response teams are simulated and out of scope. Reports are logged in-memory only.
+
+---
+
+## 🛡️ Staff Mode (Incident Reporting Pipeline)
+
+Stadium Copilot features an internal operations workspace dedicated to volunteers and stadium staff:
+1. **Free-Text & Voice Reporting**: Staff members can type or use the **Web Speech API** microphone voice input to describe issues they observe (e.g. medical emergencies, facility leaks, crowd blocks).
+2. **GenAI Structuring Pipeline**: The text is parsed by Gemini via a specialized operational instruction set. It extracts and standardizes:
+   - **Category**: Classifies incidents into exactly one of `crowding`, `medical`, `security`, `facility`, or `other`.
+   - **Location**: Maps the description to the closest known node from the stadium layout graph (e.g., matching "leaking toilet" to "Restroom 2").
+   - **Urgency**: Detects urgency level (`low`, `medium`, `high`) conservatively. Any query referring to injuries, bleeding, violence, danger, or weapons is automatically flagged as `high`.
+   - **Summary**: Creates a clean, single-sentence summary of the ticket.
+3. **Live Operations Feed**: Logged incidents are dynamically loaded into an operational status feed, polling every 5 seconds to provide staff with a real-time ticketing dashboard.
 
 ---
 

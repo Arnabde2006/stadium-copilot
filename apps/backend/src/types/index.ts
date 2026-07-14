@@ -66,3 +66,13 @@ export interface ReuniteResponse {
   meetupNode: string;
   members: ReuniteMemberResult[];
 }
+
+export interface IncidentReport {
+  id: string;
+  category: 'crowding' | 'medical' | 'security' | 'facility' | 'other';
+  location: string;
+  urgency: 'low' | 'medium' | 'high';
+  summary: string;
+  rawInput: string;
+  timestamp: string;
+}

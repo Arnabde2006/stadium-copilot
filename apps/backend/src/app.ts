@@ -4,6 +4,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import assistantRouter from './routes/assistant';
 import reuniteRouter from './routes/reunite';
+import staffRouter from './routes/staff';
 
 // Bootstrap environment configurations
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 // Register Assistant API routes
 app.use('/api/assistant', assistantRouter);
 app.use('/api/assistant', reuniteRouter);
+app.use('/api/staff', staffRouter);
 
 // Serves static client assets in production
 const frontendDist = path.join(__dirname, '../../frontend/dist');

@@ -6,7 +6,8 @@ import StadiumMap from './components/StadiumMap';
 import CrowdAlertBanner from './components/CrowdAlertBanner';
 import AccessibilityToggle from './components/AccessibilityToggle';
 import ReunitePanel from './components/ReunitePanel';
-import { ChatBubbleLeftRightIcon, MapIcon, TrashIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import StaffPanel from './components/StaffPanel';
+import { ChatBubbleLeftRightIcon, MapIcon, TrashIcon, UserGroupIcon, ShieldExclamationIcon } from '@heroicons/react/24/outline';
 
 export const App: React.FC = () => {
   const {
@@ -37,7 +38,7 @@ export const App: React.FC = () => {
     clearReunite,
   } = useReunite();
 
-  const [activeTab, setActiveTab] = useState<'chat' | 'reunite' | 'map'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'reunite' | 'staff' | 'map'>('chat');
 
   return (
     <div className="flex flex-col h-screen w-screen bg-fifa-dark text-slate-100 font-sans">
@@ -84,6 +85,16 @@ export const App: React.FC = () => {
               }`}
             >
               Reunite
+            </button>
+            <button
+              onClick={() => setActiveTab('staff')}
+              className={`px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all select-none border border-amber-500/20 ${
+                activeTab === 'staff'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'text-amber-400 hover:text-amber-300 bg-amber-500/5'
+              }`}
+            >
+              🛡️ Staff
             </button>
           </div>
 
@@ -165,6 +176,8 @@ export const App: React.FC = () => {
               onUpdateMember={updateMember}
               onFindMeetup={findMeetup}
             />
+          ) : activeTab === 'staff' ? (
+            <StaffPanel />
           ) : (
             <ChatWindow
               messages={messages}
@@ -217,6 +230,18 @@ export const App: React.FC = () => {
         >
           <UserGroupIcon className="h-5 w-5" />
           <span className="text-[10px] font-bold uppercase tracking-wider">Reunite</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('staff')}
+          className={`flex flex-col items-center gap-1 py-1 px-4 rounded-xl transition-all border border-amber-500/5 ${
+            activeTab === 'staff'
+              ? 'text-amber-400 bg-fifa-dark/50'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <ShieldExclamationIcon className="h-5 w-5" />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Staff</span>
         </button>
 
         <button

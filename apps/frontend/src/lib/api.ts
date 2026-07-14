@@ -1,4 +1,4 @@
-import { StadiumGraph, CrowdDensity, QueryResponse, ReuniteMemberInput, ReuniteResponse } from '../types';
+import { StadiumGraph, CrowdDensity, QueryResponse, ReuniteMemberInput, ReuniteResponse, IncidentReport } from '../types';
 
 const API_PREFIX = '/api/assistant';
 
@@ -68,3 +68,34 @@ export async function reuniteMembers(
   }
   return response.json();
 }
+
+/**
+ * Submit an incident report
+ */
+export async function reportIncident(input: string): Promise<IncidentReport> {
+  const response = await fetch('/api/staff/report', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ input }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.error || 'Failed to report incident');
+  }
+  return response.json();
+}
+
+/**
+ * Retrieve all logged incidents
+ */
+export async function getIncidents(): Promise<IncidentReport[]> {
+  const response = await fetch('/api/staff/reports');
+  if (!response.ok) {
+    throw new Error('Failed to retrieve incident reports');
+  }
+  return response.json();
+}
+
