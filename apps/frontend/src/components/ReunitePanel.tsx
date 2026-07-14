@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { StadiumNode, ReuniteMemberInput, ReuniteResponse } from '../types';
 import { useVoiceInput } from '../hooks/useVoiceInput';
 import { Users, UserPlus, Trash2, MapPin, Mic, MicOff, User, Star } from 'lucide-react';
