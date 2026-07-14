@@ -47,8 +47,8 @@ export const App: React.FC = () => {
         <div className="flex items-center gap-2.5">
           <span className="text-xl">🏟️</span>
           <div>
-            <h1 className="text-sm font-extrabold tracking-wider uppercase text-white">Stadium Copilot</h1>
-            <p className="text-[10px] text-fifa-gold font-semibold tracking-wider uppercase">FIFA World Cup 2026</p>
+            <h1 className="text-base font-bold tracking-widest uppercase text-white font-display">Stadium Copilot</h1>
+            <p className="text-[10px] text-fifa-gold font-semibold tracking-widest uppercase font-display">FIFA World Cup 2026</p>
           </div>
         </div>
 
@@ -69,29 +69,33 @@ export const App: React.FC = () => {
       <div className="bg-fifa-navy/40 px-4 py-2.5 border-b border-slate-800/60 flex flex-wrap gap-3 items-center justify-between flex-shrink-0 text-xs text-slate-300">
         <div className="flex flex-wrap items-center gap-4">
           {/* Desktop Mode Switcher */}
-          <div className="flex items-center gap-1 bg-slate-800/60 p-0.5 rounded border border-slate-700/60 shadow-inner">
+          <div className="flex items-center gap-5 select-none">
             <button
               onClick={() => setActiveTab('chat')}
-              className={`px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all select-none ${
-                activeTab === 'chat' ? 'bg-fifa-blue text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 ${
+                activeTab === 'chat'
+                  ? 'border-fifa-clear text-slate-100'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
               Assistant
             </button>
             <button
               onClick={() => setActiveTab('reunite')}
-              className={`px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all select-none ${
-                activeTab === 'reunite' ? 'bg-fifa-blue text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 ${
+                activeTab === 'reunite'
+                  ? 'border-fifa-clear text-slate-100'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
               Reunite
             </button>
             <button
               onClick={() => setActiveTab('staff')}
-              className={`px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all select-none border border-amber-500/20 ${
+              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 ${
                 activeTab === 'staff'
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'text-amber-400 hover:text-amber-300 bg-amber-500/5'
+                  ? 'border-amber-500 text-amber-400'
+                  : 'border-transparent text-amber-500/60 hover:text-amber-400'
               }`}
             >
               🛡️ Staff
@@ -212,48 +216,48 @@ export const App: React.FC = () => {
           onClick={() => setActiveTab('chat')}
           className={`flex flex-col items-center gap-1 py-1 px-4 rounded-xl transition-all ${
             activeTab === 'chat'
-              ? 'text-fifa-gold bg-fifa-dark/50'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-fifa-clear bg-transparent font-semibold'
+              : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
           <ChatBubbleLeftRightIcon className="h-5 w-5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Assistant</span>
+          <span className="text-[10px] font-display uppercase tracking-wider">Assistant</span>
         </button>
 
         <button
           onClick={() => setActiveTab('reunite')}
           className={`flex flex-col items-center gap-1 py-1 px-4 rounded-xl transition-all ${
             activeTab === 'reunite'
-              ? 'text-fifa-gold bg-fifa-dark/50'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-fifa-clear bg-transparent font-semibold'
+              : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
           <UserGroupIcon className="h-5 w-5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Reunite</span>
+          <span className="text-[10px] font-display uppercase tracking-wider">Reunite</span>
         </button>
 
         <button
           onClick={() => setActiveTab('staff')}
-          className={`flex flex-col items-center gap-1 py-1 px-4 rounded-xl transition-all border border-amber-500/5 ${
+          className={`flex flex-col items-center gap-1 py-1 px-4 rounded-xl transition-all ${
             activeTab === 'staff'
-              ? 'text-amber-400 bg-fifa-dark/50'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-amber-400 bg-transparent font-semibold'
+              : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
           <ShieldExclamationIcon className="h-5 w-5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Staff</span>
+          <span className="text-[10px] font-display uppercase tracking-wider">Staff</span>
         </button>
 
         <button
           onClick={() => setActiveTab('map')}
           className={`flex flex-col items-center gap-1 py-1 px-4 rounded-xl transition-all ${
             activeTab === 'map'
-              ? 'text-fifa-gold bg-fifa-dark/50'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'text-fifa-clear bg-transparent font-semibold'
+              : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
           <MapIcon className="h-5 w-5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Stadium Map</span>
+          <span className="text-[10px] font-display uppercase tracking-wider font-semibold">Map</span>
         </button>
       </nav>
     </div>

@@ -133,16 +133,16 @@ export const StaffPanel: React.FC = () => {
       <div className="bg-slate-800/40 px-4 py-3 border-b border-slate-800/80 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldExclamationIcon className="h-5 w-5 text-fifa-gold" />
-          <span className="font-bold text-xs uppercase tracking-wider text-slate-200">Operations Command</span>
+          <span className="font-display font-bold text-xs uppercase tracking-widest text-slate-200">Operations Command</span>
         </div>
-        <span className="bg-amber-500/10 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-widest">
+        <span className="font-display bg-amber-500/10 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-widest">
           Internal Tool
         </span>
       </div>
 
       {/* Input area */}
       <form onSubmit={handleSubmit} className="p-4 border-b border-slate-800/80 bg-fifa-navy/20 space-y-3">
-        <h3 className="text-xs font-bold text-fifa-gold uppercase tracking-wider">Log Real-time Incident</h3>
+        <h3 className="font-display text-xs font-bold text-fifa-gold uppercase tracking-widest">Log Real-time Incident</h3>
         
         {error && (
           <div className="bg-red-950/30 border border-red-500/20 text-red-200 text-[11px] px-3 py-2 rounded">
@@ -190,7 +190,7 @@ export const StaffPanel: React.FC = () => {
       {/* Incident list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Incident Feed</h3>
+          <h3 className="font-display text-xs font-bold text-slate-400 uppercase tracking-widest">Live Incident Feed</h3>
           <span className="text-[10px] text-slate-500 font-medium">Total: {incidents.length}</span>
         </div>
 
@@ -210,13 +210,13 @@ export const StaffPanel: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {getCategoryIcon(inc.category)}
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                  <span className="font-display text-[10px] font-bold uppercase tracking-widest text-slate-300">
                     {inc.category}
                   </span>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded tracking-wide ${getUrgencyBadgeClasses(inc.urgency)}`}>
+                  <span className={`font-display text-[9px] font-extrabold uppercase px-2 py-0.5 rounded tracking-widest ${getUrgencyBadgeClasses(inc.urgency)}`}>
                     {inc.urgency}
                   </span>
                   <span className="text-[10px] text-slate-500">

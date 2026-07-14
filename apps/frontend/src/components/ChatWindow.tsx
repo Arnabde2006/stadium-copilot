@@ -96,7 +96,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             <div className="w-14 h-14 rounded-full bg-fifa-navy border border-fifa-gold/30 flex items-center justify-center text-xl shadow-md">
               🏟️
             </div>
-            <h3 className="font-bold text-fifa-gold text-base tracking-wide">Stadium Copilot Active</h3>
+            <h3 className="font-display font-bold text-fifa-gold text-base tracking-widest uppercase">Stadium Copilot Active</h3>
             <p className="text-xs text-slate-400 max-w-[280px] leading-relaxed">
               Ask navigation questions in any language. I will guide you along routes that avoid congested crowd zones.
             </p>
@@ -132,7 +132,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             <button
               key={`chip-${index}`}
               onClick={() => onSendMessage(c.text)}
-              className="text-[10px] font-semibold px-2.5 py-1.5 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/50 hover:border-slate-500 transition-all select-none"
+              className="text-[10px] font-semibold px-2.5 py-1.5 rounded-full bg-transparent hover:bg-fifa-clear/10 text-slate-300 hover:text-white border border-slate-700 hover:border-fifa-clear/40 transition-all select-none"
             >
               {c.label}
             </button>

@@ -46,7 +46,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
       <div className="flex items-center gap-2 border-b border-slate-800/80 pb-3 flex-shrink-0">
         <UserGroupIcon className="h-5 w-5 text-fifa-gold animate-pulse" />
         <div>
-          <h2 className="font-bold text-xs sm:text-sm tracking-wide uppercase text-white">Reunite Group Meetup</h2>
+          <h2 className="font-display font-bold text-xs sm:text-sm tracking-widest uppercase text-white">Reunite Group Meetup</h2>
           <p className="text-[9px] sm:text-[10px] text-slate-400">Locates optimal center-point based on walking times</p>
         </div>
       </div>
@@ -59,7 +59,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
             className="bg-fifa-navy/40 border border-slate-850 rounded-lg p-3 flex flex-col gap-2 relative transition-all"
           >
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold text-fifa-gold uppercase tracking-wider">
+              <span className="font-display text-[10px] font-bold text-fifa-gold uppercase tracking-widest">
                 👤 Member {index + 1}
               </span>
               {members.length > 2 && (
@@ -159,7 +159,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
           <div className="flex items-center gap-2 border-b border-slate-800/80 pb-2">
             <span className="text-base select-none">⭐</span>
             <div>
-              <h3 className="font-bold text-[10px] uppercase tracking-wide text-fifa-gold">
+              <h3 className="font-display font-bold text-[10px] uppercase tracking-widest text-fifa-gold">
                 Optimized Meetup Location:
               </h3>
               <p className="text-xs font-bold text-white">

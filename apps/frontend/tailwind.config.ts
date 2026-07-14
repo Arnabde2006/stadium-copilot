@@ -9,15 +9,15 @@ export default {
     extend: {
       colors: {
         fifa: {
-          dark: '#0B132B',
-          navy: '#1C2541',
-          gold: '#C5A880',
-          yellow: '#FFD700',
-          blue: '#1E40AF',
-          accent: '#3B82F6',
-          congested: '#EF4444',
-          moderate: '#F59E0B',
-          clear: '#10B981',
+          dark: '#0A0F1A',
+          navy: '#121826',
+          gold: '#F2B441',
+          yellow: '#F2B441',
+          blue: '#1B6E4A',
+          accent: '#1B6E4A',
+          congested: '#E23B3B',
+          moderate: '#F2B441',
+          clear: '#1B6E4A',
         }
       },
       animation: {

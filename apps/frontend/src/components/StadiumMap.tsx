@@ -20,6 +20,46 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
   onSelectStartLocation,
   reuniteResult = null
 }) => {
+  // Map node coordinates to a concentric radial stadium layout
+  const getCustomNodeCoords = (nodeId: string): { x: number; y: number } => {
+    const cx = 250;
+    const cy = 250;
+    
+    switch (nodeId) {
+      // Ring 1 (Sections, Radius 105)
+      case 'sec-100': return { x: cx, y: cy - 105 }; // -90 deg
+      case 'sec-101': return { x: cx + 91, y: cy - 53 }; // -30 deg
+      case 'sec-102': return { x: cx + 91, y: cy + 53 }; // 30 deg
+      case 'sec-103': return { x: cx, y: cy + 105 }; // 90 deg
+      case 'sec-104': return { x: cx - 91, y: cy + 53 }; // 150 deg
+      case 'sec-105': return { x: cx - 91, y: cy - 53 }; // 210 deg
+
+      // Ring 2 (Food/Restrooms, Radius 165)
+      case 'food-stall-a': return { x: cx, y: cy - 165 }; // -90 deg
+      case 'restroom-2':   return { x: cx + 143, y: cy - 83 }; // -30 deg
+      case 'food-stall-b': return { x: cx + 143, y: cy + 83 }; // 30 deg
+      case 'restroom-3':   return { x: cx, y: cy + 165 }; // 90 deg
+      case 'food-stall-c': return { x: cx - 143, y: cy + 83 }; // 150 deg
+      case 'restroom-1':   return { x: cx - 143, y: cy - 83 }; // 210 deg
+
+      // Ring 3 (Gates/Exits, Radius 225)
+      case 'exit-east': return { x: cx + 225, y: cy }; // 0 deg
+      case 'gate-c':    return { x: cx + 113, y: cy + 195 }; // 60 deg
+      case 'gate-d':    return { x: cx - 113, y: cy + 195 }; // 120 deg
+      case 'exit-west': return { x: cx - 225, y: cy }; // 180 deg
+      case 'gate-a':    return { x: cx - 113, y: cy - 195 }; // 240 deg
+      case 'gate-b':    return { x: cx + 113, y: cy - 195 }; // 300 deg
+
+      default:
+        return { x: cx, y: cy };
+    }
+  };
+
+  const mappedNodes = nodes.map(n => ({
+    ...n,
+    ...getCustomNodeCoords(n.id)
+  }));
+
   // Utility: Check if a node is in the suggested path
   const isNodeInPath = (nodeId: string) => suggestedPath.includes(nodeId);
 
@@ -48,15 +88,15 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     return false;
   };
 
-  const memberColors = ['#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899']; // Amber, Blue, Purple, Pink
+  const memberColors = ['#F2B441', '#3B82F6', '#8B5CF6', '#EC4899']; // Gold, Blue, Purple, Pink
 
-  // Get color color coding based on density
+  // Get color coding based on density
   const getDensityColor = (nodeId: string) => {
     const data = densities.find(d => d.nodeId === nodeId);
-    if (!data) return '#10B981'; // default clear green
-    if (data.level === 'high') return '#EF4444'; // congested red
-    if (data.level === 'medium') return '#F59E0B'; // moderate amber
-    return '#10B981'; // clear green
+    if (!data) return '#1B6E4A'; // default clear turf-green
+    if (data.level === 'high') return '#E23B3B'; // congested red
+    if (data.level === 'medium') return '#F2B441'; // moderate gold
+    return '#1B6E4A'; // clear turf-green
   };
 
   // Node symbols or styles depending on node type
@@ -68,12 +108,12 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
 
     // Dynamic ring stroke styling for active route
     const ringStyle = isStart
-      ? 'stroke-fifa-yellow stroke-[3] animate-pulse'
+      ? 'stroke-[#F2B441] stroke-[3] animate-pulse'
       : isEnd
       ? 'stroke-blue-400 stroke-[3] animate-bounce'
       : isPathNode
       ? 'stroke-white stroke-[1.5]'
-      : 'stroke-slate-600 stroke-[1]';
+      : 'stroke-slate-700/60 stroke-[1]';
 
     switch (node.type) {
       case 'gate':
@@ -137,7 +177,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
   };
 
   return (
-    <div className="relative w-full bg-fifa-navy border border-slate-700/50 rounded-xl p-4 shadow-inner flex flex-col items-center">
+    <div className="relative w-full bg-fifa-navy border border-slate-800/80 rounded-xl p-4 shadow-inner flex flex-col items-center">
       {/* SVG Path Animations */}
       <svg className="hidden">
         <defs>
@@ -156,25 +196,38 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
       </svg>
 
       <div className="w-full flex justify-between items-center text-[10px] sm:text-xs text-slate-400 mb-3 px-1">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-2.5 bg-fifa-clear rounded-sm"></span> Low
-          <span className="inline-block w-2.5 h-2.5 bg-fifa-moderate rounded-sm ml-1"></span> Med
-          <span className="inline-block w-2.5 h-2.5 bg-fifa-congested rounded-sm ml-1"></span> High
+        <span className="flex items-center gap-1.5 font-display text-[9px] tracking-wider uppercase text-slate-400">
+          <span className="inline-block w-2.5 h-2.5 bg-fifa-clear rounded-sm"></span> Clear
+          <span className="inline-block w-2.5 h-2.5 bg-fifa-moderate rounded-sm ml-1"></span> Moderate
+          <span className="inline-block w-2.5 h-2.5 bg-fifa-congested rounded-sm ml-1"></span> Congested
         </span>
-        <span className="text-fifa-gold font-medium">Click node to change Start Position</span>
+        <span className="text-fifa-gold font-display text-[9px] uppercase tracking-wider font-semibold">Click node to change Start Position</span>
       </div>
 
-      <div className="w-full overflow-auto flex justify-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-800">
+      <div className="w-full overflow-auto flex justify-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-900/60">
         <svg viewBox="0 0 500 500" className="w-full max-w-[450px] aspect-square">
-          {/* Ambient Pitch Field Outline in Center */}
-          <rect x={180} y={200} width={140} height={100} fill="none" stroke="#ffffff10" strokeWidth="2" rx="4" />
-          <circle cx={250} cy={250} r={25} fill="none" stroke="#ffffff10" strokeWidth="2" />
-          <line x1={250} y1={200} x2={250} y2={300} stroke="#ffffff10" strokeWidth="2" />
+          {/* Turf Green Soccer Pitch Center Field */}
+          {/* Outer Boundary */}
+          <rect x={185} y={205} width={130} height={90} fill="#1B6E4A" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />
+          {/* Center Circle & Line */}
+          <circle cx={250} cy={250} r={20} fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
+          <line x1={250} y1={205} x2={250} y2={295} stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
+          <circle cx={250} cy={250} r={1.5} fill="#F4F1EA" fillOpacity="0.25" />
+          
+          {/* Left Goal Area & Penalty Box */}
+          <rect x={185} y={227.5} width={15} height={45} fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
+          <rect x={185} y={240} width={5} height={20} fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
+          <path d="M 200,240 A 10,10 0 0,1 200,260" fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
+          
+          {/* Right Goal Area & Penalty Box */}
+          <rect x={300} y={227.5} width={15} height={45} fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
+          <rect x={310} y={240} width={5} height={20} fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
+          <path d="M 300,240 A 10,10 0 0,0 300,260" fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
 
-          {/* Graph Edges */}
+          {/* Graph Edges / Concourse walkways */}
           {edges.map((edge, idx) => {
-            const fromNode = nodes.find(n => n.id === edge.from);
-            const toNode = nodes.find(n => n.id === edge.to);
+            const fromNode = mappedNodes.find(n => n.id === edge.from);
+            const toNode = mappedNodes.find(n => n.id === edge.to);
             if (!fromNode || !toNode) return null;
 
             if (reuniteResult) {
@@ -193,7 +246,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     stroke="#475569"
                     strokeWidth={1.5}
                     strokeLinecap="round"
-                    className="opacity-20"
+                    className="opacity-15"
                   />
                   {activeMemberRoutes.map((mr, mrIdx) => (
                     <line
@@ -223,7 +276,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     y1={fromNode.y}
                     x2={toNode.x}
                     y2={toNode.y}
-                    stroke="#FFD700"
+                    stroke="#F2B441"
                     strokeWidth="6"
                     strokeLinecap="round"
                     className="opacity-40 blur-[2px]"
@@ -234,17 +287,17 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                   y1={fromNode.y}
                   x2={toNode.x}
                   y2={toNode.y}
-                  stroke={activePath ? '#FFD700' : '#475569'}
+                  stroke={activePath ? '#F2B441' : '#475569'}
                   strokeWidth={activePath ? 3.5 : 1.5}
                   strokeLinecap="round"
-                  className={activePath ? 'marching-ants' : 'opacity-40'}
+                  className={activePath ? 'marching-ants' : 'opacity-25'}
                 />
               </g>
             );
           })}
 
           {/* Graph Nodes */}
-          {nodes.map(node => {
+          {mappedNodes.map(node => {
             const isStart = node.id === userLocation;
             const isEnd = suggestedPath.length > 0 && node.id === suggestedPath[suggestedPath.length - 1];
             const isMeetupPoint = reuniteResult && node.id === reuniteResult.meetupNode;
@@ -258,7 +311,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     cy={node.y}
                     r={isMeetupPoint ? 20 : isStart ? 18 : 15}
                     fill="none"
-                    stroke={isMeetupPoint ? '#FFD700' : isStart ? '#FFD700' : '#3B82F6'}
+                    stroke={isMeetupPoint ? '#F2B441' : isStart ? '#F2B441' : '#3B82F6'}
                     strokeWidth={isMeetupPoint ? 3.5 : 2.5}
                     className="animate-ping opacity-75"
                   />
@@ -270,11 +323,11 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                 {/* Node Text Label */}
                 <text
                   x={node.x}
-                  y={node.type === 'section' ? node.y + 4 : node.y + 20}
+                  y={node.type === 'section' ? node.y + 4 : node.y + 18}
                   textAnchor="middle"
-                  fill={node.type === 'section' ? '#ffffff' : '#94A3B8'}
-                  className={`select-none pointer-events-none font-bold ${
-                    node.type === 'section' ? 'text-[9px]' : 'text-[8px]'
+                  fill={node.type === 'section' ? '#F4F1EA' : '#8B93A7'}
+                  className={`select-none pointer-events-none font-display uppercase font-bold tracking-wider ${
+                    node.type === 'section' ? 'text-[9px]' : 'text-[7.5px]'
                   }`}
                 >
                   {node.type === 'section' ? node.name.replace('Section ', '') : node.name.split(' (')[0]}
