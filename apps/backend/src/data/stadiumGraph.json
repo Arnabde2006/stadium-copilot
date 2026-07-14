@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    { "id": "gate-a", "name": "Gate A", "type": "gate", "description": "North-West Entrance / Gate", "x": 100, "y": 100 },
+    { "id": "gate-b", "name": "Gate B", "type": "gate", "description": "North-East Entrance / Gate", "x": 400, "y": 100 },
+    { "id": "gate-c", "name": "Gate C", "type": "gate", "description": "South-East Entrance / Gate", "x": 400, "y": 400 },
+    { "id": "gate-d", "name": "Gate D", "type": "gate", "description": "South-West Entrance / Gate", "x": 100, "y": 400 },
+    { "id": "sec-100", "name": "Section 100", "type": "section", "description": "North Stand Seating", "x": 200, "y": 150 },
+    { "id": "sec-101", "name": "Section 101", "type": "section", "description": "North-East Stand Seating", "x": 300, "y": 150 },
+    { "id": "sec-102", "name": "Section 102", "type": "section", "description": "East Stand Seating", "x": 350, "y": 250 },
+    { "id": "sec-103", "name": "Section 103", "type": "section", "description": "South-East Stand Seating", "x": 300, "y": 350 },
+    { "id": "sec-104", "name": "Section 104", "type": "section", "description": "South Stand Seating", "x": 200, "y": 350 },
+    { "id": "sec-105", "name": "Section 105", "type": "section", "description": "West Stand Seating", "x": 150, "y": 250 },
+    { "id": "restroom-1", "name": "Restroom 1", "type": "restroom", "description": "North Concourse Restroom", "x": 180, "y": 110 },
+    { "id": "restroom-2", "name": "Restroom 2", "type": "restroom", "description": "East Concourse Restroom", "x": 420, "y": 200 },
+    { "id": "restroom-3", "name": "Restroom 3", "type": "restroom", "description": "South Concourse Restroom", "x": 250, "y": 420 },
+    { "id": "food-stall-a", "name": "Taco Corner (Food Stall A)", "type": "food", "description": "Mexican Food & Snacks", "x": 250, "y": 90 },
+    { "id": "food-stall-b", "name": "Burger Barn (Food Stall B)", "type": "food", "description": "Burgers, Fries & Beer", "x": 440, "y": 300 },
+    { "id": "food-stall-c", "name": "Pitchside Sips (Food Stall C)", "type": "food", "description": "Soft Drinks & Coffee", "x": 60, "y": 300 },
+    { "id": "exit-east", "name": "Exit East", "type": "exit", "description": "Main Exit East (to Subway)", "x": 480, "y": 250 },
+    { "id": "exit-west", "name": "Exit West", "type": "exit", "description": "Main Exit West (to Parking)", "x": 20, "y": 250 }
+  ],
+  "edges": [
+    { "from": "sec-100", "to": "sec-101", "baseWeight": 30, "stepFree": true, "lowStimulation": true },
+    { "from": "sec-101", "to": "sec-102", "baseWeight": 30, "stepFree": false, "lowStimulation": true },
+    { "from": "sec-102", "to": "sec-103", "baseWeight": 30, "stepFree": true, "lowStimulation": true },
+    { "from": "sec-103", "to": "sec-104", "baseWeight": 30, "stepFree": true, "lowStimulation": true },
+    { "from": "sec-104", "to": "sec-105", "baseWeight": 30, "stepFree": true, "lowStimulation": true },
+    { "from": "sec-105", "to": "sec-100", "baseWeight": 30, "stepFree": true, "lowStimulation": true },
+
+    { "from": "gate-a", "to": "sec-100", "baseWeight": 45, "stepFree": true, "lowStimulation": true },
+    { "from": "gate-a", "to": "restroom-1", "baseWeight": 20, "stepFree": true, "lowStimulation": false },
+    { "from": "gate-a", "to": "exit-west", "baseWeight": 50, "stepFree": true, "lowStimulation": true },
+
+    { "from": "gate-b", "to": "sec-101", "baseWeight": 45, "stepFree": true, "lowStimulation": true },
+    { "from": "gate-b", "to": "restroom-2", "baseWeight": 20, "stepFree": true, "lowStimulation": false },
+    { "from": "gate-b", "to": "exit-east", "baseWeight": 50, "stepFree": true, "lowStimulation": true },
+
+    { "from": "gate-c", "to": "sec-103", "baseWeight": 45, "stepFree": false, "lowStimulation": true },
+    { "from": "gate-c", "to": "restroom-3", "baseWeight": 20, "stepFree": true, "lowStimulation": false },
+    { "from": "gate-c", "to": "exit-east", "baseWeight": 60, "stepFree": true, "lowStimulation": true },
+
+    { "from": "gate-d", "to": "sec-104", "baseWeight": 45, "stepFree": true, "lowStimulation": true },
+    { "from": "gate-d", "to": "restroom-3", "baseWeight": 25, "stepFree": true, "lowStimulation": false },
+    { "from": "gate-d", "to": "exit-west", "baseWeight": 60, "stepFree": true, "lowStimulation": true },
+
+    { "from": "food-stall-a", "to": "sec-100", "baseWeight": 15, "stepFree": true, "lowStimulation": false },
+    { "from": "food-stall-a", "to": "sec-101", "baseWeight": 25, "stepFree": true, "lowStimulation": false },
+    { "from": "food-stall-b", "to": "sec-102", "baseWeight": 15, "stepFree": true, "lowStimulation": false },
+    { "from": "food-stall-b", "to": "sec-103", "baseWeight": 25, "stepFree": true, "lowStimulation": false },
+    { "from": "food-stall-c", "to": "sec-105", "baseWeight": 15, "stepFree": true, "lowStimulation": false },
+    { "from": "food-stall-c", "to": "sec-104", "baseWeight": 25, "stepFree": true, "lowStimulation": false },
+
+    { "from": "restroom-1", "to": "sec-100", "baseWeight": 15, "stepFree": true, "lowStimulation": false },
+    { "from": "restroom-2", "to": "sec-102", "baseWeight": 15, "stepFree": true, "lowStimulation": false },
+    { "from": "restroom-3", "to": "sec-104", "baseWeight": 20, "stepFree": true, "lowStimulation": false },
+
+    { "from": "exit-west", "to": "sec-105", "baseWeight": 40, "stepFree": true, "lowStimulation": true },
+    { "from": "exit-east", "to": "sec-102", "baseWeight": 40, "stepFree": true, "lowStimulation": true }
+  ]
+}

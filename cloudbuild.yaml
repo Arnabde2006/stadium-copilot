@@ -1,0 +1,42 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO_NAME/stadium-copilot:$COMMIT_SHA'
+      - '-f'
+      - 'docker/Dockerfile'
+      - '.'
+
+  # Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO_NAME/stadium-copilot:$COMMIT_SHA'
+
+  # Deploy to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'stadium-copilot'
+      - '--image'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO_NAME/stadium-copilot:$COMMIT_SHA'
+      - '--region'
+      - '$_RUN_REGION'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+
+images:
+  - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO_NAME/stadium-copilot:$COMMIT_SHA'
+
+substitutions:
+  _AR_REGION: 'us-central1'
+  _AR_REPO_NAME: 'stadium-copilot-repo'
+  _RUN_REGION: 'us-central1'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
