@@ -1,7 +1,7 @@
 import React from 'react';
 import { Message, StadiumNode } from '../types';
 import LanguageBadge from './LanguageBadge';
-import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
+import { AlertCircle } from 'lucide-react';
 
 interface MessageBubbleProps {
   message: Message;
@@ -43,7 +43,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
 
             {isBot && message.congestionAlert && (
               <div className="mt-2 bg-red-950/40 border border-red-500/20 rounded-lg p-2 flex items-start gap-2">
-                <ExclamationCircleIcon className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
                 <span className="text-[11px] text-red-200 leading-snug">
                   {message.congestionAlert}
                 </span>

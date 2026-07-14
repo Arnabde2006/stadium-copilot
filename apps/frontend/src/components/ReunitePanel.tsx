@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StadiumNode, ReuniteMemberInput, ReuniteResponse } from '../types';
-import { PlusIcon, TrashIcon, UserGroupIcon, MapPinIcon, MicrophoneIcon } from '@heroicons/react/24/outline';
+import { useVoiceInput } from '../hooks/useVoiceInput';
+import { Users, UserPlus, Trash2, MapPin, Mic, MicOff, User, Star } from 'lucide-react';
 
 interface ReunitePanelProps {
   nodes: StadiumNode[];
@@ -34,78 +35,43 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
     return node ? node.name : nodeId;
   };
 
-  // Web Speech API Integration for Group Members
-  const SpeechRecognition =
-    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const [activeTarget, setActiveTarget] = useState<{ id: string; field: 'name' | 'location' } | null>(null);
 
-  const [listeningState, setListeningState] = useState<{ memberId: string; field: 'name' | 'location' } | null>(null);
-  const recognitionRef = useRef<any>(null);
+  // Consume shared speech hook
+  const { isListening, toggleListening, stopListening } = useVoiceInput((text) => {
+    if (!activeTarget) return;
+    const { id, field } = activeTarget;
 
-  useEffect(() => {
-    if (SpeechRecognition) {
-      const rec = new SpeechRecognition();
-      rec.continuous = false;
-      rec.interimResults = false;
-      rec.lang = 'en-US';
-
-      rec.onresult = (event: any) => {
-        if (!listeningState) return;
-        const transcript = event.results[0][0].transcript;
-        const normalized = transcript.toLowerCase().trim();
-        const { memberId, field } = listeningState;
-
-        if (field === 'name') {
-          // Set Name from transcript
-          onUpdateMember(memberId, { name: transcript });
-        } else if (field === 'location') {
-          // Select closest location
-          const match = nodeOptions.find(opt => {
-            const optName = opt.name.toLowerCase();
-            return optName.includes(normalized) || normalized.includes(optName);
-          });
-          if (match) {
-            onUpdateMember(memberId, { location: match.id });
-          } else {
-            // Number fallbacks
-            const numMatch = normalized.replace(/\s+/g, '');
-            const matchByNum = nodeOptions.find(opt => {
-              const optName = opt.name.toLowerCase().replace(/\s+/g, '');
-              return optName.includes(numMatch) || numMatch.includes(optName);
-            });
-            if (matchByNum) {
-              onUpdateMember(memberId, { location: matchByNum.id });
-            }
-          }
+    if (field === 'name') {
+      onUpdateMember(id, { name: text });
+    } else if (field === 'location') {
+      const normalized = text.toLowerCase().trim();
+      const match = nodeOptions.find(opt => {
+        const optName = opt.name.toLowerCase();
+        return optName.includes(normalized) || normalized.includes(optName);
+      });
+      if (match) {
+        onUpdateMember(id, { location: match.id });
+      } else {
+        const numMatch = normalized.replace(/\s+/g, '');
+        const matchByNum = nodeOptions.find(opt => {
+          const optName = opt.name.toLowerCase().replace(/\s+/g, '');
+          return optName.includes(numMatch) || numMatch.includes(optName);
+        });
+        if (matchByNum) {
+          onUpdateMember(id, { location: matchByNum.id });
         }
-      };
-
-      rec.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setListeningState(null);
-      };
-
-      rec.onend = () => {
-        setListeningState(null);
-      };
-
-      recognitionRef.current = rec;
-    }
-  }, [SpeechRecognition, listeningState]);
-
-  const toggleListening = (memberId: string, field: 'name' | 'location'): void => {
-    if (!recognitionRef.current) {
-      alert('Speech Recognition is not fully supported in this browser. Please type.');
-      return;
-    }
-
-    if (listeningState && listeningState.memberId === memberId && listeningState.field === field) {
-      recognitionRef.current.stop();
-    } else {
-      if (listeningState) {
-        recognitionRef.current.stop();
       }
-      setListeningState({ memberId, field });
-      recognitionRef.current.start();
+    }
+  });
+
+  const toggleListeningState = (memberId: string, field: 'name' | 'location'): void => {
+    if (activeTarget && activeTarget.id === memberId && activeTarget.field === field) {
+      stopListening();
+      setActiveTarget(null);
+    } else {
+      setActiveTarget({ id: memberId, field });
+      toggleListening();
     }
   };
 
@@ -119,7 +85,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
     <div className="flex flex-col h-full bg-fifa-dark/10 rounded-xl border border-slate-700/40 p-4 space-y-4 shadow-md overflow-hidden">
       {/* Title block */}
       <div className="flex items-center gap-2 border-b border-slate-800/80 pb-3 flex-shrink-0">
-        <UserGroupIcon className="h-5 w-5 text-fifa-gold animate-pulse" />
+        <Users className="h-5 w-5 text-fifa-gold" strokeWidth={1.75} />
         <div>
           <h2 className="font-display font-bold text-xs sm:text-sm tracking-widest uppercase text-white">Reunite Group Meetup</h2>
           <p className="text-[9px] sm:text-[10px] text-slate-400">Locates optimal center-point based on walking times</p>
@@ -133,9 +99,10 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
             key={m.id}
             className="bg-fifa-navy/40 border border-slate-850 rounded-lg p-3 flex flex-col gap-2 relative transition-all"
           >
-            <div className="flex justify-between items-center">
-              <span className="font-display text-[10px] font-bold text-fifa-gold uppercase tracking-widest">
-                👤 Member {index + 1}
+            <div className="flex justify-between items-center select-none">
+              <span className="font-display text-[10px] font-bold text-fifa-gold uppercase tracking-widest flex items-center gap-1">
+                <User className="h-3 w-3 text-fifa-gold flex-shrink-0" strokeWidth={1.75} />
+                <span>Member {index + 1}</span>
               </span>
               {members.length > 2 && (
                 <button
@@ -144,7 +111,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
                   className="text-slate-500 hover:text-red-400 transition-colors p-0.5"
                   title="Remove Group Member"
                 >
-                  <TrashIcon className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
                 </button>
               )}
             </div>
@@ -161,15 +128,19 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
                 />
                 <button
                   type="button"
-                  onClick={() => toggleListening(m.id, 'name')}
+                  onClick={() => toggleListeningState(m.id, 'name')}
                   className={`p-1.5 rounded border transition-colors flex-shrink-0 focus:outline-none ${
-                    listeningState?.memberId === m.id && listeningState?.field === 'name'
+                    activeTarget?.id === m.id && activeTarget?.field === 'name' && isListening
                       ? 'bg-red-650 border-red-500 text-white animate-pulse'
                       : 'bg-fifa-card border-slate-800 text-slate-400 hover:text-white'
                   }`}
                   title="Speak Name"
                 >
-                  <MicrophoneIcon className="h-3.5 w-3.5" />
+                  {activeTarget?.id === m.id && activeTarget?.field === 'name' && isListening ? (
+                    <MicOff className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  ) : (
+                    <Mic className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  )}
                 </button>
               </div>
 
@@ -188,15 +159,19 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
                 </select>
                 <button
                   type="button"
-                  onClick={() => toggleListening(m.id, 'location')}
+                  onClick={() => toggleListeningState(m.id, 'location')}
                   className={`p-1.5 rounded border transition-colors flex-shrink-0 focus:outline-none ${
-                    listeningState?.memberId === m.id && listeningState?.field === 'location'
+                    activeTarget?.id === m.id && activeTarget?.field === 'location' && isListening
                       ? 'bg-red-650 border-red-500 text-white animate-pulse'
                       : 'bg-fifa-card border-slate-800 text-slate-400 hover:text-white'
                   }`}
                   title="Speak Location"
                 >
-                  <MicrophoneIcon className="h-3.5 w-3.5" />
+                  {activeTarget?.id === m.id && activeTarget?.field === 'location' && isListening ? (
+                    <MicOff className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  ) : (
+                    <Mic className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  )}
                 </button>
               </div>
 
@@ -220,9 +195,9 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
           <button
             type="button"
             onClick={onAddMember}
-            className="w-full border border-dashed border-slate-800 hover:border-slate-650 hover:bg-slate-800/10 rounded-lg py-2 flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-white transition-all select-none"
+            className="w-full border border-dashed border-slate-850 hover:border-slate-700 hover:bg-slate-800/10 rounded-lg py-2 flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-white transition-all select-none focus:outline-none"
           >
-            <PlusIcon className="h-4 w-4" />
+            <UserPlus className="h-4 w-4" strokeWidth={1.75} />
             Add Group Member
           </button>
         )}
@@ -237,7 +212,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
           type="button"
           disabled={isLoading}
           onClick={() => onFindMeetup(accessibilityMode)}
-          className="w-full bg-[#1B6E4A] hover:bg-[#228557] text-[#E8E6E0] py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5 select-none"
+          className="w-full bg-[#1B6E4A] hover:bg-[#228557] text-[#E8E6E0] py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5 select-none focus:outline-none"
         >
           {isLoading ? (
             <>
@@ -246,7 +221,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
             </>
           ) : (
             <>
-              <MapPinIcon className="h-4 w-4" />
+              <MapPin className="h-4 w-4" strokeWidth={1.75} />
               Calculate Meetup Location
             </>
           )}
@@ -257,7 +232,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
       {reuniteResult && (
         <div className="mt-1 bg-fifa-navy/30 border border-slate-800 rounded-xl p-3 space-y-3 flex-shrink-0 max-h-[180px] overflow-y-auto">
           <div className="flex items-center gap-2 border-b border-slate-800/80 pb-2">
-            <span className="text-base select-none">⭐</span>
+            <Star className="h-4 w-4 text-fifa-gold flex-shrink-0" strokeWidth={1.75} fill="currentColor" />
             <div>
               <h3 className="font-display font-bold text-[10px] uppercase tracking-widest text-fifa-gold">
                 Optimized Meetup Location:

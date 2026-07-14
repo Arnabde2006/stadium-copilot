@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useChat } from './hooks/useChat';
 import { useReunite } from './hooks/useReunite';
 import ChatWindow from './components/ChatWindow';
@@ -8,7 +8,7 @@ import AccessibilityToggle from './components/AccessibilityToggle';
 import ReunitePanel from './components/ReunitePanel';
 import StaffPanel from './components/StaffPanel';
 import RouteSummary from './components/RouteSummary';
-import { ChatBubbleLeftRightIcon, MapIcon, TrashIcon, UserGroupIcon, ShieldExclamationIcon } from '@heroicons/react/24/outline';
+import { MessageSquare, Users, ShieldAlert, Map, Trash2, Sun, Moon } from 'lucide-react';
 
 export const App: React.FC = () => {
   const {
@@ -42,30 +42,56 @@ export const App: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'chat' | 'reunite' | 'staff' | 'map'>('chat');
 
+  // Dual-Theme Switching state logic
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('stadium-copilot-theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('stadium-copilot-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   return (
-    <div className="flex flex-col h-screen w-screen bg-fifa-dark text-slate-100 font-sans">
-      {/* Top Header Navigation */}
-      <header className="bg-fifa-navy border-b border-slate-800/80 px-4 py-3 flex items-center justify-between flex-shrink-0 z-10 shadow-md">
-        <div className="flex items-center gap-2.5">
-          {/* Stylized Vector Stadium Logo */}
-          <svg viewBox="0 0 100 100" className="h-5.5 w-5.5 text-fifa-gold flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round">
-            <ellipse cx="50" cy="50" rx="42" ry="26" />
-            <ellipse cx="50" cy="50" rx="26" ry="15" strokeDasharray="6 4" strokeWidth="4" />
-            <circle cx="50" cy="50" r="5" fill="currentColor" />
-          </svg>
-          <div>
-            <h1 className="text-base font-bold tracking-widest uppercase text-white font-display">Stadium Copilot</h1>
-            <p className="text-[10px] text-fifa-gold font-semibold tracking-widest uppercase font-display">FIFA World Cup 2026</p>
-          </div>
+    <div className="flex flex-col h-screen w-screen bg-fifa-dark text-slate-100 font-sans transition-colors duration-250">
+      {/* Top Header Navigation (Compacted vertical spacing) */}
+      <header className="bg-fifa-navy border-b border-slate-800/80 px-4 py-1.5 flex items-center justify-between flex-shrink-0 z-10 shadow-md">
+        <div className="flex items-baseline gap-2">
+          <h1 className="text-sm font-bold tracking-widest uppercase text-white font-display">Stadium Copilot</h1>
+          <span className="text-[9px] text-fifa-gold font-semibold tracking-widest uppercase font-display select-none">· FIFA World Cup 2026</span>
         </div>
 
-        {/* Live Simulator Pulsing Heartbeat */}
-        <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fifa-clear opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-fifa-clear"></span>
-          </span>
-          <span className="text-[9px] font-bold text-fifa-clear uppercase tracking-widest hidden sm:inline">Live Simulator Feed</span>
+        <div className="flex items-center gap-4">
+          {/* Live Simulator Pulsing Heartbeat */}
+          <div className="flex items-center gap-1.5 select-none">
+            <span className="flex h-1.5 w-1.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fifa-clear opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-fifa-clear"></span>
+            </span>
+            <span className="text-[8.5px] font-bold text-fifa-clear uppercase tracking-widest hidden sm:inline">Live Simulator Feed</span>
+          </div>
+
+          {/* Theme switcher toggle button */}
+          <button
+            onClick={toggleTheme}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white transition-all bg-fifa-card hover:bg-fifa-elevated border border-slate-800/60 flex items-center justify-center focus:outline-none"
+            title="Toggle Light/Dark Theme"
+          >
+            {theme === 'light' ? (
+              <Moon className="h-4 w-4" strokeWidth={1.75} />
+            ) : (
+              <Sun className="h-4 w-4" strokeWidth={1.75} />
+            )}
+          </button>
         </div>
       </header>
 
@@ -146,7 +172,7 @@ export const App: React.FC = () => {
               onClick={clearReunite}
               className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 hover:text-red-400 transition-colors uppercase tracking-wider"
             >
-              <TrashIcon className="h-3.5 w-3.5" />
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
               Clear Meetup
             </button>
           )}
@@ -156,7 +182,7 @@ export const App: React.FC = () => {
               onClick={clearChat}
               className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 hover:text-red-400 transition-colors uppercase tracking-wider"
             >
-              <TrashIcon className="h-3.5 w-3.5" />
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
               Clear Journey
             </button>
           )}
@@ -237,7 +263,7 @@ export const App: React.FC = () => {
               : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
-          <ChatBubbleLeftRightIcon className="h-5 w-5" />
+          <MessageSquare className="h-5 w-5" strokeWidth={1.75} />
           <span className="text-[10px] font-display uppercase tracking-wider">Assistant</span>
         </button>
 
@@ -249,7 +275,7 @@ export const App: React.FC = () => {
               : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
-          <UserGroupIcon className="h-5 w-5" />
+          <Users className="h-5 w-5" strokeWidth={1.75} />
           <span className="text-[10px] font-display uppercase tracking-wider">Reunite</span>
         </button>
 
@@ -261,7 +287,7 @@ export const App: React.FC = () => {
               : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
-          <ShieldExclamationIcon className="h-5 w-5" />
+          <ShieldAlert className="h-5 w-5" strokeWidth={1.75} />
           <span className="text-[10px] font-display uppercase tracking-wider">Staff</span>
         </button>
 
@@ -273,7 +299,7 @@ export const App: React.FC = () => {
               : 'text-slate-500 hover:text-slate-400 font-normal'
           }`}
         >
-          <MapIcon className="h-5 w-5" />
+          <Map className="h-5 w-5" strokeWidth={1.75} />
           <span className="text-[10px] font-display uppercase tracking-wider font-semibold">Map</span>
         </button>
       </nav>

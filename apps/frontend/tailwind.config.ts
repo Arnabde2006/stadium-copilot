@@ -9,17 +9,17 @@ export default {
     extend: {
       colors: {
         fifa: {
-          dark: '#0B0F19',
-          navy: '#121826',
-          card: '#1B2236',
-          elevated: '#242D47',
-          gold: '#D99B26',
-          yellow: '#D99B26',
-          blue: '#228557',
-          accent: '#228557',
-          congested: '#C93B3B',
-          moderate: '#D99B26',
-          clear: '#228557',
+          dark: 'var(--surface-base)',
+          navy: 'var(--surface-panel)',
+          card: 'var(--surface-card)',
+          elevated: 'var(--surface-elevated)',
+          gold: 'var(--fifa-moderate)',
+          yellow: 'var(--fifa-moderate)',
+          blue: 'var(--fifa-clear)',
+          accent: 'var(--fifa-clear)',
+          congested: 'var(--fifa-congested)',
+          moderate: 'var(--fifa-moderate)',
+          clear: 'var(--fifa-clear)',
         }
       },
       animation: {

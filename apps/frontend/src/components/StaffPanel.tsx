@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStaffReports } from '../hooks/useStaffReports';
-import { 
-  ShieldExclamationIcon, 
-  HeartIcon, 
-  UsersIcon, 
-  WrenchScrewdriverIcon, 
-  ExclamationCircleIcon,
-  MapPinIcon
-} from '@heroicons/react/24/outline';
-import { MicrophoneIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import {
+  Shield,
+  Heart,
+  Users,
+  Wrench,
+  AlertCircle,
+  MapPin,
+  Mic,
+  Send
+} from 'lucide-react';
 
 function formatRelativeTime(dateString: string): string {
   const diff = Date.now() - new Date(dateString).getTime();
@@ -104,15 +105,15 @@ export const StaffPanel: React.FC = () => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'medical':
-        return <HeartIcon className="h-5 w-5 text-red-400" />;
+        return <Heart className="h-5 w-5 text-red-400" />;
       case 'security':
-        return <ShieldExclamationIcon className="h-5 w-5 text-amber-400" />;
+        return <Shield className="h-5 w-5 text-amber-400" />;
       case 'crowding':
-        return <UsersIcon className="h-5 w-5 text-fifa-gold" />;
+        return <Users className="h-5 w-5 text-fifa-gold" />;
       case 'facility':
-        return <WrenchScrewdriverIcon className="h-5 w-5 text-teal-400" />;
+        return <Wrench className="h-5 w-5 text-teal-400" />;
       default:
-        return <ExclamationCircleIcon className="h-5 w-5 text-slate-400" />;
+        return <AlertCircle className="h-5 w-5 text-slate-400" />;
     }
   };
 
@@ -132,7 +133,7 @@ export const StaffPanel: React.FC = () => {
       {/* Panel Header */}
       <div className="bg-slate-800/40 px-4 py-3 border-b border-slate-800/80 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ShieldExclamationIcon className="h-5 w-5 text-fifa-gold" />
+          <Shield className="h-5 w-5 text-fifa-gold" />
           <span className="font-display font-bold text-xs uppercase tracking-widest text-slate-200">Operations Command</span>
         </div>
         <span className="font-display bg-amber-500/10 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-widest">
@@ -161,7 +162,7 @@ export const StaffPanel: React.FC = () => {
             }`}
             title={isListening ? 'Stop Speech Listening' : 'Use Microphone Speech Input'}
           >
-            <MicrophoneIcon className="h-4.5 w-4.5" />
+            <Mic className="h-4.5 w-4.5" />
           </button>
 
           <input
@@ -181,7 +182,7 @@ export const StaffPanel: React.FC = () => {
             {isLoading ? (
               <span className="block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              <PaperAirplaneIcon className="h-4.5 w-4.5" />
+              <Send className="h-4.5 w-4.5" />
             )}
           </button>
         </div>
@@ -227,7 +228,7 @@ export const StaffPanel: React.FC = () => {
 
               {/* Location Badge */}
               <div className="flex items-center gap-1.5 text-xs text-fifa-gold font-medium">
-                <MapPinIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
                 <span>{inc.location}</span>
               </div>
 

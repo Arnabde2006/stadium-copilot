@@ -4,19 +4,35 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Layered Elevation System and desaturated custom properties */
+/* Layered Elevation System and dual-theme variable tokens */
 :root {
+  /* Default Theme: Dark */
   --surface-base: #0B0F19;
   --surface-panel: #121826;
   --surface-card: #1B2236;
   --surface-elevated: #242D47;
   
-  --fifa-clear: #228557;
-  --fifa-moderate: #D99B26;
-  --fifa-congested: #C93B3B;
+  --fifa-clear: #228557;      /* Turf Green */
+  --fifa-moderate: #D99B26;   /* Floodlight Gold */
+  --fifa-congested: #C93B3B;  /* Alert Red */
   
-  --text-primary: #E8E6E0;
-  --text-secondary: #94A3B8;
+  --text-primary: #E8E6E0;    /* Primary off-white text */
+  --text-secondary: #94A3B8;  /* Secondary muted slate text */
+}
+
+[data-theme="light"] {
+  /* Light Theme */
+  --surface-base: #F8F9FC;     /* Soft warm off-white background */
+  --surface-panel: #FFFFFF;    /* White container */
+  --surface-card: #EDF0F7;     /* Light gray-blue card */
+  --surface-elevated: #E2E8F0; /* Selected state / ticker */
+  
+  --fifa-clear: #1B6E4A;      /* Darker turf green for 4.5:1 contrast */
+  --fifa-moderate: #C07E12;   /* Darker gold for 4.5:1 contrast */
+  --fifa-congested: #B92A2A;  /* Darker red for 4.5:1 contrast */
+  
+  --text-primary: #0F172A;    /* Slate-900 text */
+  --text-secondary: #475569;  /* Slate-600 text */
 }
 
 body {
