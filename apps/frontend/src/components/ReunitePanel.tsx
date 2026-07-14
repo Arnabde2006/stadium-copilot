@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StadiumNode, ReuniteMemberInput, ReuniteResponse } from '../types';
-import { PlusIcon, TrashIcon, UserGroupIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, UserGroupIcon, MapPinIcon, MicrophoneIcon } from '@heroicons/react/24/outline';
 
 interface ReunitePanelProps {
   nodes: StadiumNode[];
@@ -32,6 +32,81 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
   const getNodeName = (nodeId: string): string => {
     const node = nodes.find(n => n.id === nodeId);
     return node ? node.name : nodeId;
+  };
+
+  // Web Speech API Integration for Group Members
+  const SpeechRecognition =
+    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+  const [listeningState, setListeningState] = useState<{ memberId: string; field: 'name' | 'location' } | null>(null);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (SpeechRecognition) {
+      const rec = new SpeechRecognition();
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.lang = 'en-US';
+
+      rec.onresult = (event: any) => {
+        if (!listeningState) return;
+        const transcript = event.results[0][0].transcript;
+        const normalized = transcript.toLowerCase().trim();
+        const { memberId, field } = listeningState;
+
+        if (field === 'name') {
+          // Set Name from transcript
+          onUpdateMember(memberId, { name: transcript });
+        } else if (field === 'location') {
+          // Select closest location
+          const match = nodeOptions.find(opt => {
+            const optName = opt.name.toLowerCase();
+            return optName.includes(normalized) || normalized.includes(optName);
+          });
+          if (match) {
+            onUpdateMember(memberId, { location: match.id });
+          } else {
+            // Number fallbacks
+            const numMatch = normalized.replace(/\s+/g, '');
+            const matchByNum = nodeOptions.find(opt => {
+              const optName = opt.name.toLowerCase().replace(/\s+/g, '');
+              return optName.includes(numMatch) || numMatch.includes(optName);
+            });
+            if (matchByNum) {
+              onUpdateMember(memberId, { location: matchByNum.id });
+            }
+          }
+        }
+      };
+
+      rec.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setListeningState(null);
+      };
+
+      rec.onend = () => {
+        setListeningState(null);
+      };
+
+      recognitionRef.current = rec;
+    }
+  }, [SpeechRecognition, listeningState]);
+
+  const toggleListening = (memberId: string, field: 'name' | 'location'): void => {
+    if (!recognitionRef.current) {
+      alert('Speech Recognition is not fully supported in this browser. Please type.');
+      return;
+    }
+
+    if (listeningState && listeningState.memberId === memberId && listeningState.field === field) {
+      recognitionRef.current.stop();
+    } else {
+      if (listeningState) {
+        recognitionRef.current.stop();
+      }
+      setListeningState({ memberId, field });
+      recognitionRef.current.start();
+    }
   };
 
   const locales = [
@@ -75,27 +150,55 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {/* Member Name */}
-              <input
-                type="text"
-                value={m.name}
-                onChange={e => onUpdateMember(m.id, { name: e.target.value })}
-                placeholder="Name"
-                className="bg-fifa-card border border-slate-800 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#1B6E4A]"
-              />
+              {/* Member Name with Voice Mic Button */}
+              <div className="flex gap-1.5 items-center">
+                <input
+                  type="text"
+                  value={m.name}
+                  onChange={e => onUpdateMember(m.id, { name: e.target.value })}
+                  placeholder="Name"
+                  className="flex-1 bg-fifa-card border border-slate-800 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#1B6E4A]"
+                />
+                <button
+                  type="button"
+                  onClick={() => toggleListening(m.id, 'name')}
+                  className={`p-1.5 rounded border transition-colors flex-shrink-0 focus:outline-none ${
+                    listeningState?.memberId === m.id && listeningState?.field === 'name'
+                      ? 'bg-red-650 border-red-500 text-white animate-pulse'
+                      : 'bg-fifa-card border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                  title="Speak Name"
+                >
+                  <MicrophoneIcon className="h-3.5 w-3.5" />
+                </button>
+              </div>
 
-              {/* Member Current Location */}
-              <select
-                value={m.location}
-                onChange={e => onUpdateMember(m.id, { location: e.target.value })}
-                className="bg-fifa-card border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-[#1B6E4A]"
-              >
-                {nodeOptions.map(opt => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.name}
-                  </option>
-                ))}
-              </select>
+              {/* Member Current Location with Voice Mic Button */}
+              <div className="flex gap-1.5 items-center">
+                <select
+                  value={m.location}
+                  onChange={e => onUpdateMember(m.id, { location: e.target.value })}
+                  className="flex-1 bg-fifa-card border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-[#1B6E4A]"
+                >
+                  {nodeOptions.map(opt => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => toggleListening(m.id, 'location')}
+                  className={`p-1.5 rounded border transition-colors flex-shrink-0 focus:outline-none ${
+                    listeningState?.memberId === m.id && listeningState?.field === 'location'
+                      ? 'bg-red-650 border-red-500 text-white animate-pulse'
+                      : 'bg-fifa-card border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                  title="Speak Location"
+                >
+                  <MicrophoneIcon className="h-3.5 w-3.5" />
+                </button>
+              </div>
 
               {/* Language Selection */}
               <select

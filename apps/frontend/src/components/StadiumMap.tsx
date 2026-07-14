@@ -281,30 +281,8 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
 
   return (
     <div className="relative w-full flex-1 min-h-0 bg-fifa-navy border border-slate-800/80 rounded-xl p-4 shadow-inner flex flex-col items-center overflow-hidden">
-      {/* SVG Path Animations */}
-      <svg className="hidden">
-        <defs>
-          <style>{`
-            @keyframes march {
-              to {
-                stroke-dashoffset: -20;
-              }
-            }
-            .marching-ants {
-              stroke-dasharray: 8, 4;
-              animation: march 1s linear infinite;
-            }
-          `}</style>
-          {/* Colorblind-Safe Diagonal Hatching Pattern for Congested Zones */}
-          <pattern id="hatch-congested" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-            <rect width="10" height="10" fill="#C93B3B" fillOpacity="0.25" />
-            <line x1="0" y1="0" x2="0" y2="10" stroke="#C93B3B" strokeWidth="2.5" />
-          </pattern>
-        </defs>
-      </svg>
-
-      <div className="w-full flex justify-between items-center text-[10px] sm:text-xs text-slate-400 mb-3 px-1 select-none">
-        <span className="flex items-center gap-2 font-display text-[9px] tracking-wider uppercase text-slate-400">
+      <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-[10px] text-slate-400 mb-3 px-1 select-none">
+        <span className="flex flex-wrap items-center gap-2 font-display text-[9px] tracking-wider uppercase text-slate-400">
           <span className="flex items-center gap-1">
             <span className="flex items-center justify-center w-3.5 h-3.5 bg-fifa-clear text-[7.5px] text-white font-bold rounded-sm">✓</span> Clear
           </span>
@@ -320,6 +298,24 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
 
       <div className="w-full flex-1 min-h-0 flex justify-center items-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-900/60 overflow-hidden">
         <svg viewBox="0 0 500 500" className="h-full w-auto max-w-full aspect-square">
+          <defs>
+            <style>{`
+              @keyframes march {
+                to {
+                  stroke-dashoffset: -20;
+                }
+              }
+              .marching-ants {
+                stroke-dasharray: 8, 4;
+                animation: march 1s linear infinite;
+              }
+            `}</style>
+            {/* Colorblind-Safe Diagonal Hatching Pattern for Congested Zones */}
+            <pattern id="hatch-congested" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+              <rect width="10" height="10" fill="#C93B3B" fillOpacity="0.25" />
+              <line x1="0" y1="0" x2="0" y2="10" stroke="#C93B3B" strokeWidth="2.5" />
+            </pattern>
+          </defs>
           {/* Turf Green Soccer Pitch Center Field (Precisely Centered) */}
           {/* Outer Boundary */}
           <rect x={185} y={205} width={130} height={90} fill="#228557" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />

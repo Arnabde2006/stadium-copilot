@@ -29,7 +29,7 @@ export const CrowdAlertBanner: React.FC<CrowdAlertBannerProps> = ({ densities, n
         </span>
         <span className="text-[10px] font-bold text-fifa-gold tracking-widest uppercase select-none">LIVE</span>
       </div>
-      <div className="flex-1 overflow-hidden relative select-none">
+      <div className="flex-1 min-w-0 overflow-hidden relative select-none">
         <div className="inline-block text-xs sm:text-sm text-fifa-gold tracking-widest whitespace-nowrap animate-marquee font-bold">
           HIGH SEVERITY ALERT :: HEAVILY CONGESTED AREAS: {names.toUpperCase()} :: REROUTING TRAFFIC TO AVOID THESE SECTORS :: PLEASE FOLLOW SIGNS
         </div>

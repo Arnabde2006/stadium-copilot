@@ -69,9 +69,9 @@ body {
 
 /* LED Scoreboard Marquee Animation */
 .animate-marquee {
-  display: inline-block;
-  white-space: nowrap;
-  width: max-content;
+  display: inline-block !important;
+  white-space: nowrap !important;
+  width: max-content !important;
   animation: marquee-scroll 25s linear infinite;
 }
 
@@ -141,6 +141,41 @@ svg *:focus-visible {
 .fade-enter-active {
   opacity: 1;
   transition: opacity 200ms ease-in-out;
+}
+
+/* Global Form Inputs Base Theme Overrides */
+input,
+select,
+textarea {
+  background-color: var(--surface-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  border-radius: 0.5rem !important; /* rounded-lg */
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.7 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--fifa-clear, #228557) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(34, 133, 87, 0.25) !important;
+}
+
+/* Custom Text Selection Highlight overrides */
+::selection {
+  background-color: rgba(34, 133, 87, 0.35) !important;
+  color: var(--text-primary) !important;
+}
+
+::-moz-selection {
+  background-color: rgba(34, 133, 87, 0.35) !important;
+  color: var(--text-primary) !important;
 }
 
 
