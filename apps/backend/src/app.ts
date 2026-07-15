@@ -11,6 +11,16 @@ dotenv.config();
 
 const app = express();
 
+// Restore req.url from Vercel's x-matched-path or x-invoke-path headers
+app.use((req, res, next) => {
+  const matchedPath = req.headers['x-matched-path'] || req.headers['x-invoke-path'];
+  if (matchedPath) {
+    const rawPath = Array.isArray(matchedPath) ? matchedPath[0] : matchedPath;
+    req.url = rawPath;
+  }
+  next();
+});
+
 app.use(cors());
 app.use(express.json());
 
