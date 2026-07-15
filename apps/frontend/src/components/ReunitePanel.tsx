@@ -38,7 +38,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
   const [activeTarget, setActiveTarget] = useState<{ id: string; field: 'name' | 'location' } | null>(null);
 
   // Consume shared speech hook
-  const { isListening, toggleListening, stopListening } = useVoiceInput((text) => {
+  const { isListening, toggleListening, stopListening, isSupported } = useVoiceInput((text) => {
     if (!activeTarget) return;
     const { id, field } = activeTarget;
 
@@ -128,13 +128,16 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
                 />
                 <button
                   type="button"
+                  disabled={!isSupported}
                   onClick={() => toggleListeningState(m.id, 'name')}
                   className={`p-1.5 rounded border transition-colors flex-shrink-0 focus:outline-none ${
-                    activeTarget?.id === m.id && activeTarget?.field === 'name' && isListening
+                    !isSupported
+                      ? 'opacity-40 cursor-not-allowed border-slate-800 text-slate-650'
+                      : activeTarget?.id === m.id && activeTarget?.field === 'name' && isListening
                       ? 'bg-red-650 border-red-500 text-white animate-pulse'
                       : 'bg-fifa-card border-slate-800 text-slate-400 hover:text-white'
                   }`}
-                  title="Speak Name"
+                  title={!isSupported ? 'Speech Recognition is not supported in this browser' : 'Speak Name'}
                 >
                   {activeTarget?.id === m.id && activeTarget?.field === 'name' && isListening ? (
                     <MicOff className="h-3.5 w-3.5" strokeWidth={1.75} />
@@ -159,13 +162,16 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
                 </select>
                 <button
                   type="button"
+                  disabled={!isSupported}
                   onClick={() => toggleListeningState(m.id, 'location')}
                   className={`p-1.5 rounded border transition-colors flex-shrink-0 focus:outline-none ${
-                    activeTarget?.id === m.id && activeTarget?.field === 'location' && isListening
+                    !isSupported
+                      ? 'opacity-40 cursor-not-allowed border-slate-800 text-slate-650'
+                      : activeTarget?.id === m.id && activeTarget?.field === 'location' && isListening
                       ? 'bg-red-650 border-red-500 text-white animate-pulse'
                       : 'bg-fifa-card border-slate-800 text-slate-400 hover:text-white'
                   }`}
-                  title="Speak Location"
+                  title={!isSupported ? 'Speech Recognition is not supported in this browser' : 'Speak Location'}
                 >
                   {activeTarget?.id === m.id && activeTarget?.field === 'location' && isListening ? (
                     <MicOff className="h-3.5 w-3.5" strokeWidth={1.75} />

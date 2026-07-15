@@ -19,11 +19,28 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const baseInputRef = useRef('');
 
-  // Consume shared speech recognition hook
-  const { isListening, toggleListening } = useVoiceInput((text) => {
-    setInputValue(prev => `${prev} ${text}`.trim());
-  });
+  // Keep track of input value before speech session started
+  useEffect(() => {
+    if (isListening) {
+      baseInputRef.current = inputValue;
+    }
+  }, [isListening]);
+
+  // Consume shared speech recognition hook with interim updates
+  const { isListening, toggleListening, isSupported } = useVoiceInput(
+    (text) => {
+      setInputValue(prev => {
+        const updated = `${baseInputRef.current} ${text}`.trim();
+        baseInputRef.current = updated;
+        return updated;
+      });
+    },
+    (text) => {
+      setInputValue(`${baseInputRef.current} ${text}`.trim());
+    }
+  );
 
   const handleSend = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -101,13 +118,22 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       <form onSubmit={handleSend} className="p-3 border-t border-slate-800/80 bg-fifa-navy/50 flex gap-2 items-center">
         <button
           type="button"
+          disabled={!isSupported}
           onClick={toggleListening}
           className={`p-2.5 rounded-xl border flex-shrink-0 transition-all duration-300 ${
-            isListening
+            !isSupported
+              ? 'opacity-40 cursor-not-allowed bg-slate-850 border-slate-800 text-slate-550'
+              : isListening
               ? 'bg-red-650 border-red-500 text-white animate-pulse'
               : 'bg-slate-800 border-slate-700/80 text-slate-400 hover:bg-slate-700 hover:text-white'
           }`}
-          title={isListening ? 'Stop Speech Listening' : 'Use Microphone Speech Input'}
+          title={
+            !isSupported
+              ? 'Speech Recognition is not supported in this browser'
+              : isListening
+              ? 'Stop Speech Listening'
+              : 'Use Microphone Speech Input'
+          }
         >
           {isListening ? (
             <MicOff className="h-4.5 w-4.5" strokeWidth={1.75} />
@@ -120,7 +146,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
-          placeholder={isListening ? 'Listening to speech...' : 'Type or ask a question...'}
+          placeholder={
+            !isSupported
+              ? 'Speech input not supported. Please type...'
+              : isListening
+              ? 'Listening to speech...'
+              : 'Type or ask a question...'
+          }
           disabled={isListening}
           className="flex-1 bg-fifa-card border border-slate-800 rounded-xl px-4 py-2.5 text-base text-[#E8E6E0] placeholder-slate-500 focus:outline-none focus:border-[#1B6E4A] disabled:opacity-50 font-normal"
         />

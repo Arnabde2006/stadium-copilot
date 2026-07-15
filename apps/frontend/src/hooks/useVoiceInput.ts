@@ -1,18 +1,28 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-export const useVoiceInput = (onTranscript: (text: string) => void) => {
+export const useVoiceInput = (
+  onTranscript: (text: string) => void,
+  onInterimTranscript?: (text: string) => void
+) => {
   const SpeechRecognition =
     (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const onTranscriptRef = useRef(onTranscript);
+  const onInterimTranscriptRef = useRef(onInterimTranscript);
   const isListeningRef = useRef(false);
+  const accumulatedFinalText = useRef('');
+  const sessionFinalTextRef = useRef('');
 
-  // Keep callback ref fresh to avoid restarting listeners on handler changes
+  // Keep callback refs fresh
   useEffect(() => {
     onTranscriptRef.current = onTranscript;
   }, [onTranscript]);
+
+  useEffect(() => {
+    onInterimTranscriptRef.current = onInterimTranscript;
+  }, [onInterimTranscript]);
 
   // Keep isListeningRef in sync with state
   useEffect(() => {
@@ -36,7 +46,18 @@ export const useVoiceInput = (onTranscript: (text: string) => void) => {
       }
 
       if (finalTranscript) {
+        sessionFinalTextRef.current = `${sessionFinalTextRef.current} ${finalTranscript}`.trim();
         onTranscriptRef.current(finalTranscript.trim());
+      }
+
+      let currentSessionText = '';
+      for (let i = 0; i < event.results.length; ++i) {
+        currentSessionText += event.results[i][0].transcript;
+      }
+
+      const fullText = `${accumulatedFinalText.current} ${currentSessionText}`.trim();
+      if (onInterimTranscriptRef.current) {
+        onInterimTranscriptRef.current(fullText);
       }
     };
 
@@ -48,17 +69,20 @@ export const useVoiceInput = (onTranscript: (text: string) => void) => {
     };
 
     rec.onend = () => {
-        // If we are still supposed to be listening (not manually stopped), restart!
-        if (recognitionRef.current && isListeningRef.current) {
-          try {
-            recognitionRef.current.start();
-          } catch (err) {
-            console.error('Failed to restart speech recognition:', err);
-          }
-        } else {
-          setIsListening(false);
+      // Append current session's final text to accumulated final text
+      accumulatedFinalText.current = `${accumulatedFinalText.current} ${sessionFinalTextRef.current}`.trim();
+      sessionFinalTextRef.current = ''; // Reset for next session
+
+      if (recognitionRef.current && isListeningRef.current) {
+        try {
+          recognitionRef.current.start();
+        } catch (err) {
+          console.error('Failed to restart speech recognition:', err);
         }
-      };
+      } else {
+        setIsListening(false);
+      }
+    };
 
     recognitionRef.current = rec;
   }, [SpeechRecognition]);
@@ -77,6 +101,8 @@ export const useVoiceInput = (onTranscript: (text: string) => void) => {
       alert('Speech Recognition is not fully supported in this browser. Please type.');
       return;
     }
+    accumulatedFinalText.current = '';
+    sessionFinalTextRef.current = '';
     setIsListening(true);
     try {
       recognitionRef.current.start();
@@ -102,8 +128,10 @@ export const useVoiceInput = (onTranscript: (text: string) => void) => {
 
   return {
     isListening,
+    isSupported: !!SpeechRecognition,
     toggleListening,
     startListening,
     stopListening
   };
 };
+
