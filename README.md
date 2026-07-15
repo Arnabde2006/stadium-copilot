@@ -105,3 +105,26 @@ The "Reunite" mode helps groups of 2-4 fans find the most convenient meeting spo
 ## 🌐 Enterprise Differentiation & Position
 
 **Stadium Copilot** is designed as a lightweight, group-aware, and multilingual fan-companion overlay. It is **not** a replacement for FIFA's official enterprise stadium digital-twin navigation systems, which integrate with full building management software (BMS), high-accuracy IoT beacon arrays, and internal security operations. Instead, Stadium Copilot acts as a crowd-sourced or API-integrated client layer, putting GenAI-powered translation and peer-to-peer group coordinating tools directly into fans' hands via simple QR scans.
+
+---
+
+## 📦 Deployment Options
+
+This monorepo supports two deployment pathways:
+
+### 1. Vercel Single-Deployment (Frontend + Serverless Backend)
+
+The entire application can be deployed as a single Vercel project using the workspace configuration defined in [vercel.json](file:///d:/Promtwars/Stadium%20Copilot/vercel.json):
+
+- **Build Target**: The frontend is compiled and served as a static single-page application (SPA) at the root domain (`/`).
+- **Serverless Backend**: The Express application routes all `/api/*` requests to a serverless function adapter ([api/index.ts](file:///d:/Promtwars/Stadium%20Copilot/api/index.ts)).
+- **Environment Variables**: Configure the following Environment Variable in your Vercel Project Dashboard:
+  - `GEMINI_API_KEY`: Your Google Gemini API Key.
+- **Crowd Simulator Behavioral Adjustments**: On Vercel, the backend automatically detects the stateless serverless environment and disables the persistent `setInterval` daemon. Instead, it dynamically generates deterministic and realistic crowd densities using a 10-second time-bucketed seed, ensuring the interactive map routes fans dynamic paths reliably.
+
+### 2. Docker & Google Cloud Run (Alternative Deployment)
+
+The pre-existing containerized setup is still valid and fully supported as an alternative deployment target:
+- Backend Docker configurations and Dockerfiles are located under the `docker/` directory for long-running container environments.
+- This path preserves persistent in-memory states and background update intervals.
+
