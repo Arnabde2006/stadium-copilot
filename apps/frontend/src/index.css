@@ -18,6 +18,10 @@
   
   --text-primary: #E8E6E0;    /* Primary off-white text */
   --text-secondary: #94A3B8;  /* Secondary muted slate text */
+
+  --text-size-body: 16px;
+  --text-size-secondary: 14px;
+  --text-size-map-label: 13px;
 }
 
 [data-theme="light"] {
@@ -33,6 +37,10 @@
   
   --text-primary: #0F172A;    /* Slate-900 text */
   --text-secondary: #475569;  /* Slate-600 text */
+
+  --text-size-body: 16px;
+  --text-size-secondary: 14px;
+  --text-size-map-label: 13px;
 }
 
 body {
@@ -44,9 +52,18 @@ body {
   overflow: hidden;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   font-family: 'Inter', sans-serif;
-  font-size: 18px;
+  font-size: var(--text-size-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+.uppercase,
+[class*="uppercase"] {
+  letter-spacing: 0.05em !important;
+}
+
+.tracking-caps {
+  letter-spacing: 0.05em !important;
 }
 
 /* Custom scrollbars */

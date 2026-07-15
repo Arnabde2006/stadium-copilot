@@ -105,7 +105,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             <button
               key={`chip-${index}`}
               onClick={() => onSendMessage(c.text)}
-              className="text-[10px] font-semibold px-2.5 py-1.5 rounded-full bg-transparent hover:bg-fifa-clear/10 text-slate-300 hover:text-white border border-slate-700 hover:border-fifa-clear/40 transition-all select-none flex items-center gap-1.5"
+              className="text-xs font-semibold px-2.5 py-1.5 rounded-full bg-transparent hover:bg-fifa-clear/10 text-slate-300 hover:text-white border border-slate-700 hover:border-fifa-clear/40 transition-all select-none flex items-center gap-1.5"
             >
               <MessageSquare className="h-3.5 w-3.5 text-fifa-gold flex-shrink-0" strokeWidth={1.75} />
               <span>{c.label}</span>

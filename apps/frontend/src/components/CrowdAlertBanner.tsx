@@ -27,10 +27,10 @@ export const CrowdAlertBanner: React.FC<CrowdAlertBannerProps> = ({ densities, n
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fifa-gold opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-fifa-gold"></span>
         </span>
-        <span className="text-[10px] font-bold text-fifa-gold tracking-widest uppercase select-none">LIVE</span>
+        <span className="text-xs font-bold text-fifa-gold tracking-widest uppercase select-none">LIVE</span>
       </div>
       <div className="flex-1 min-w-0 overflow-hidden relative select-none">
-        <div className="inline-block text-xs sm:text-sm text-fifa-gold tracking-widest whitespace-nowrap animate-marquee font-bold">
+        <div className="inline-block text-sm text-fifa-gold tracking-widest whitespace-nowrap animate-marquee font-bold">
           HIGH SEVERITY ALERT :: HEAVILY CONGESTED AREAS: {names.toUpperCase()} :: REROUTING TRAFFIC TO AVOID THESE SECTORS :: PLEASE FOLLOW SIGNS
         </div>
       </div>

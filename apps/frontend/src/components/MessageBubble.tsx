@@ -27,7 +27,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
         <div className="flex flex-col gap-1">
           {isBot && message.detectedLanguage && (
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Stadium Copilot</span>
+              <span className="text-xs text-slate-400 font-semibold tracking-wider uppercase">Stadium Copilot</span>
               <LanguageBadge code={message.detectedLanguage} />
             </div>
           )}
@@ -44,7 +44,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
             {isBot && message.congestionAlert && (
               <div className="mt-2 bg-red-950/40 border border-red-500/20 rounded-lg p-2 flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
-                <span className="text-[11px] text-red-200 leading-snug">
+                <span className="text-xs text-red-200 leading-snug">
                   {message.congestionAlert}
                 </span>
               </div>
@@ -52,10 +52,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
 
             {isBot && message.suggestedPath && message.suggestedPath.length > 0 && (
               <div className="mt-3 pt-2.5 border-t border-slate-700/50">
-                <span className="text-[10px] text-fifa-gold font-bold uppercase tracking-wider block mb-1">
+                <span className="text-xs text-fifa-gold font-bold uppercase tracking-wider block mb-1">
                   🗺️ Calculated Route:
                 </span>
-                <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-300 bg-fifa-dark/50 px-2 py-1.5 rounded border border-slate-800">
+                <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-300 bg-fifa-dark/50 px-2 py-1.5 rounded border border-slate-800">
                   {message.suggestedPath.map((pathNodeId, index) => (
                     <React.Fragment key={`path-bubble-${index}`}>
                       <span className="font-semibold text-white">
@@ -71,7 +71,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, nodes }) 
             )}
           </div>
 
-          <span className={`text-[10px] text-slate-500 mt-0.5 ${isBot ? 'text-left' : 'text-right'}`}>
+          <span className={`text-xs text-slate-500 mt-0.5 ${isBot ? 'text-left' : 'text-right'}`}>
             {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>

@@ -60,21 +60,21 @@ export const RouteSummary: React.FC<RouteSummaryProps> = ({
   return (
     <div className="mb-3 bg-fifa-navy border-l-4 border-l-fifa-gold border border-slate-800 rounded-r-lg p-3 shadow-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 select-none">
       <div className="flex flex-col">
-        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest font-display">Route Destination</span>
-        <span className="font-display text-sm font-bold text-slate-100 uppercase tracking-wider">
+        <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Route Destination</span>
+        <span className="text-sm font-bold text-slate-100 uppercase tracking-wider">
           {destination}
         </span>
       </div>
       <div className="flex flex-col">
-        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest font-display">Est. Walking Time</span>
-        <span className="text-xs font-bold text-fifa-gold font-display">
+        <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Est. Walking Time</span>
+        <span className="text-xs font-bold text-fifa-gold">
           {durationText}
         </span>
       </div>
       {alertText && (
         <div className="flex-1 sm:max-w-xs md:max-w-md flex flex-col bg-fifa-dark/50 border border-fifa-gold/10 px-2.5 py-1.5 rounded">
-          <span className="text-[8px] text-fifa-gold font-bold uppercase tracking-widest font-display">Route Advisory</span>
-          <span className="text-[10px] text-slate-300 leading-normal" title={alertText}>
+          <span className="text-xs text-fifa-gold font-bold uppercase tracking-widest">Route Advisory</span>
+          <span className="text-xs text-slate-300 leading-normal" title={alertText}>
             {alertText}
           </span>
         </div>

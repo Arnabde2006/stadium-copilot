@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StadiumNode, StadiumEdge, CrowdDensity, ReuniteResponse } from '../types';
 
 interface StadiumMapProps {
@@ -9,6 +9,7 @@ interface StadiumMapProps {
   userLocation: string;
   onSelectStartLocation: (nodeId: string) => void;
   reuniteResult?: ReuniteResponse | null;
+  activeTab?: string;
 }
 
 export const StadiumMap: React.FC<StadiumMapProps> = ({
@@ -18,12 +19,229 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
   suggestedPath,
   userLocation,
   onSelectStartLocation,
-  reuniteResult = null
+  reuniteResult = null,
+  activeTab
 }) => {
   // Define ring groupings
   const RING1_NODES = ['sec-100', 'sec-101', 'sec-102', 'sec-103', 'sec-104', 'sec-105'];
   const RING2_NODES = ['food-stall-a', 'restroom-2', 'food-stall-b', 'restroom-3', 'food-stall-c', 'restroom-1'];
   const RING3_NODES = ['exit-east', 'gate-c', 'gate-d', 'exit-west', 'gate-a', 'gate-b'];
+
+  // Zoom and pan state
+  const [zoom, setZoom] = useState(1.0);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+
+  const dragRef = useRef({
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    startPanX: 0,
+    startPanY: 0
+  });
+
+  const touchRef = useRef({
+    startDist: 0,
+    startZoom: 1.0,
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    startPanX: 0,
+    startPanY: 0
+  });
+
+  const handleReset = () => {
+    setZoom(1.0);
+    setPan({ x: 0, y: 0 });
+  };
+
+  useEffect(() => {
+    handleReset();
+  }, [activeTab]);
+
+  const clampPan = (px: number, py: number, currentZoom: number) => {
+    const width = 500 / currentZoom;
+    const height = 500 / currentZoom;
+    // Allow panning up to 100px beyond boundaries (margin)
+    const minX = -100;
+    const maxX = 500 - width + 100;
+    const minY = -100;
+    const maxY = 500 - height + 100;
+    return {
+      x: Math.max(minX, Math.min(maxX, px)),
+      y: Math.max(minY, Math.min(maxY, py))
+    };
+  };
+
+  // Zoom by mouse wheel
+  const handleWheel = (e: React.WheelEvent<SVGSVGElement>) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    const w = 500 / zoom;
+    const h = 500 / zoom;
+    const svgX = pan.x + (mx / rect.width) * w;
+    const svgY = pan.y + (my / rect.height) * h;
+
+    const zoomFactor = 1.1;
+    let nextZoom = e.deltaY < 0 ? zoom * zoomFactor : zoom / zoomFactor;
+    nextZoom = Math.max(1.0, Math.min(4.0, nextZoom));
+
+    const nextW = 500 / nextZoom;
+    const nextH = 500 / nextZoom;
+
+    const nextX = svgX - (mx / rect.width) * nextW;
+    const nextY = svgY - (my / rect.height) * nextH;
+
+    const clamped = clampPan(nextX, nextY, nextZoom);
+    setZoom(nextZoom);
+    setPan(clamped);
+  };
+
+  // Drag Panning
+  const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (e.button !== 0) return; // Only left click
+    dragRef.current = {
+      isDragging: true,
+      startX: e.clientX,
+      startY: e.clientY,
+      startPanX: pan.x,
+      startPanY: pan.y
+    };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!dragRef.current.isDragging) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+
+    const w = 500 / zoom;
+    const h = 500 / zoom;
+    const svgDx = (dx / rect.width) * w;
+    const svgDy = (dy / rect.height) * h;
+
+    const nextX = dragRef.current.startPanX - svgDx;
+    const nextY = dragRef.current.startPanY - svgDy;
+
+    const clamped = clampPan(nextX, nextY, zoom);
+    setPan(clamped);
+  };
+
+  const handleMouseUpOrLeave = () => {
+    dragRef.current.isDragging = false;
+  };
+
+  // Touch handlers for mobile pan & pinch-to-zoom
+  const handleTouchStart = (e: React.TouchEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      touchRef.current = {
+        startDist: 0,
+        startZoom: zoom,
+        isDragging: true,
+        startX: t.clientX,
+        startY: t.clientY,
+        startPanX: pan.x,
+        startPanY: pan.y
+      };
+    } else if (e.touches.length === 2) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+
+      const mx = (t1.clientX + t2.clientX) / 2 - rect.left;
+      const my = (t1.clientY + t2.clientY) / 2 - rect.top;
+
+      const w = 500 / zoom;
+      const h = 500 / zoom;
+      const svgX = pan.x + (mx / rect.width) * w;
+      const svgY = pan.y + (my / rect.height) * h;
+
+      touchRef.current = {
+        startDist: dist,
+        startZoom: zoom,
+        isDragging: false,
+        startX: svgX,
+        startY: svgY,
+        startPanX: mx,
+        startPanY: my
+      };
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (e.touches.length === 1 && touchRef.current.isDragging) {
+      const t = e.touches[0];
+      const dx = t.clientX - touchRef.current.startX;
+      const dy = t.clientY - touchRef.current.startY;
+
+      const w = 500 / zoom;
+      const h = 500 / zoom;
+      const svgDx = (dx / rect.width) * w;
+      const svgDy = (dy / rect.height) * h;
+
+      const nextX = touchRef.current.startPanX - svgDx;
+      const nextY = touchRef.current.startPanY - svgDy;
+      const clamped = clampPan(nextX, nextY, zoom);
+      setPan(clamped);
+    } else if (e.touches.length === 2 && touchRef.current.startDist > 0) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+
+      const ratio = dist / touchRef.current.startDist;
+      let nextZoom = touchRef.current.startZoom * ratio;
+      nextZoom = Math.max(1.0, Math.min(4.0, nextZoom));
+
+      const nextW = 500 / nextZoom;
+      const nextH = 500 / nextZoom;
+
+      const mx = (t1.clientX + t2.clientX) / 2 - rect.left;
+      const my = (t1.clientY + t2.clientY) / 2 - rect.top;
+
+      const svgX = touchRef.current.startX;
+      const svgY = touchRef.current.startY;
+
+      let nextX = svgX - (mx / rect.width) * nextW;
+      let nextY = svgY - (my / rect.height) * nextH;
+
+      const clamped = clampPan(nextX, nextY, nextZoom);
+      setZoom(nextZoom);
+      setPan(clamped);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    touchRef.current.isDragging = false;
+    touchRef.current.startDist = 0;
+  };
+
+  // Zoom buttons helper
+  const handleButtonZoom = (zoomIn: boolean) => {
+    const zoomFactor = 1.3;
+    let nextZoom = zoomIn ? zoom * zoomFactor : zoom / zoomFactor;
+    nextZoom = Math.max(1.0, Math.min(4.0, nextZoom));
+
+    const w = 500 / zoom;
+    const h = 500 / zoom;
+
+    const svgX = pan.x + w / 2;
+    const svgY = pan.y + h / 2;
+
+    const nextW = 500 / nextZoom;
+    const nextH = 500 / nextZoom;
+
+    const nextX = svgX - nextW / 2;
+    const nextY = svgY - nextH / 2;
+
+    const clamped = clampPan(nextX, nextY, nextZoom);
+    setZoom(nextZoom);
+    setPan(clamped);
+  };
 
   // Programmatically calculate node coordinates for concentric circular rings
   const getCustomNodeCoords = (nodeId: string): { x: number; y: number } => {
@@ -236,14 +454,14 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     const data = densities.find(d => d.nodeId === node.id);
     const level = data ? data.level : 'low';
     
-    let badgeX = node.x + 11;
-    let badgeY = node.y - 11;
+    let badgeX = node.x + 16;
+    let badgeY = node.y - 16;
     if (node.type === 'section') {
-      badgeX = node.x + 15;
-      badgeY = node.y - 10;
+      badgeX = node.x + 20;
+      badgeY = node.y - 15;
     } else if (node.type === 'gate' || node.type === 'exit') {
-      badgeX = node.x + 12;
-      badgeY = node.y - 12;
+      badgeX = node.x + 16;
+      badgeY = node.y - 16;
     }
     
     let symbol = '✓';
@@ -261,17 +479,17 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
         <circle
           cx={badgeX}
           cy={badgeY}
-          r={6.5}
+          r={9}
           fill={badgeBg}
           stroke="#121826"
-          strokeWidth={1}
+          strokeWidth={1.5}
         />
         <text
           x={badgeX}
-          y={badgeY + 2}
+          y={badgeY + 4}
           textAnchor="middle"
           fill="#E8E6E0"
-          className="font-sans font-bold text-[6.5px]"
+          className="font-sans font-bold text-map-label"
         >
           {symbol}
         </text>
@@ -281,23 +499,61 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
 
   return (
     <div className="relative w-full flex-1 min-h-0 bg-fifa-navy border border-slate-800/80 rounded-xl p-4 shadow-inner flex flex-col items-center overflow-hidden">
-      <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-[10px] text-slate-400 mb-3 px-1 select-none">
-        <span className="flex flex-wrap items-center gap-2 font-display text-[9px] tracking-wider uppercase text-slate-400">
+      <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-400 mb-3 px-1 select-none">
+        <span className="flex flex-wrap items-center gap-2 tracking-wider uppercase text-slate-400">
           <span className="flex items-center gap-1">
-            <span className="flex items-center justify-center w-3.5 h-3.5 bg-fifa-clear text-[7.5px] text-white font-bold rounded-sm">✓</span> Clear
+            <span className="flex items-center justify-center w-4 h-4 bg-fifa-clear text-xs text-white font-bold rounded-sm">✓</span> Clear
           </span>
           <span className="flex items-center gap-1 ml-1.5">
-            <span className="flex items-center justify-center w-3.5 h-3.5 bg-fifa-moderate text-[7.5px] text-white font-bold rounded-sm">▲</span> Moderate
+            <span className="flex items-center justify-center w-4 h-4 bg-fifa-moderate text-xs text-white font-bold rounded-sm">▲</span> Moderate
           </span>
           <span className="flex items-center gap-1 ml-1.5">
-            <span className="flex items-center justify-center w-3.5 h-3.5 bg-fifa-congested text-[7.5px] text-white font-bold rounded-sm">⚠</span> Congested
+            <span className="flex items-center justify-center w-4 h-4 bg-fifa-congested text-xs text-white font-bold rounded-sm">⚠</span> Congested
           </span>
         </span>
-        <span className="text-fifa-gold font-display text-[9px] uppercase tracking-wider font-semibold">Click node to change Start Position</span>
+        <span className="text-fifa-gold uppercase tracking-wider font-semibold">Click node to change Start Position</span>
       </div>
 
-      <div className="w-full flex-1 min-h-0 flex justify-center items-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-900/60 overflow-hidden">
-        <svg viewBox="0 0 500 500" className="h-full w-auto max-w-full aspect-square">
+      <div className="relative w-full flex-1 min-h-0 flex justify-center items-center bg-fifa-dark/30 rounded-lg p-2 border border-slate-900/60 overflow-hidden">
+        {/* Floating Zoom Controls */}
+        <div className="absolute bottom-4 right-4 flex flex-col gap-1.5 z-10 select-none">
+          <button
+            onClick={() => handleButtonZoom(true)}
+            className="w-8 h-8 rounded-lg bg-fifa-card hover:bg-fifa-elevated border border-slate-700/80 text-white font-bold flex items-center justify-center shadow-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-fifa-clear text-sm"
+            title="Zoom In"
+          >
+            +
+          </button>
+          <button
+            onClick={() => handleButtonZoom(false)}
+            className="w-8 h-8 rounded-lg bg-fifa-card hover:bg-fifa-elevated border border-slate-700/80 text-white font-bold flex items-center justify-center shadow-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-fifa-clear text-sm"
+            title="Zoom Out"
+          >
+            −
+          </button>
+          <button
+            onClick={handleReset}
+            className="px-2 py-1.5 rounded-lg bg-fifa-card hover:bg-fifa-elevated border border-slate-700/80 text-xs text-white font-medium flex items-center justify-center shadow-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-fifa-clear"
+            title="Reset View"
+          >
+            Reset
+          </button>
+        </div>
+
+        <svg
+          viewBox={`${pan.x} ${pan.y} ${500 / zoom} ${500 / zoom}`}
+          className={`h-full w-auto max-w-full aspect-square select-none ${
+            zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+          }`}
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          onMouseLeave={handleMouseUpOrLeave}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <defs>
             <style>{`
               @keyframes march {
@@ -439,9 +695,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                   y={getLabelCoords(node).y}
                   textAnchor="middle"
                   fill={node.type === 'section' ? '#F4F1EA' : '#8B93A7'}
-                  className={`select-none pointer-events-none font-display uppercase font-bold tracking-wider ${
-                    node.type === 'section' ? 'text-[9px]' : 'text-[7.5px]'
-                  }`}
+                  className="select-none pointer-events-none font-sans uppercase font-bold tracking-wider text-map-label"
                   style={{ textShadow: '0 1px 2px rgba(10, 15, 26, 0.95), 0 0 1px rgba(10, 15, 26, 0.95)' }}
                 >
                   {node.type === 'section' ? node.name.replace('Section ', '') : node.name.split(' (')[0]}

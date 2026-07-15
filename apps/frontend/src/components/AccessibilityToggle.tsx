@@ -9,10 +9,10 @@ export const AccessibilityToggle: React.FC<AccessibilityToggleProps> = ({ enable
   return (
     <div className="flex items-center gap-3 bg-slate-800/40 border border-slate-700/60 rounded-lg px-3 py-1.5 hover:bg-slate-800/60 transition-all select-none">
       <div className="flex flex-col">
-        <span className="text-[10px] font-bold text-slate-200 tracking-wide uppercase flex items-center gap-1">
+        <span className="text-xs font-bold text-slate-200 tracking-wide uppercase flex items-center gap-1">
           <span>♿</span> Step-free &amp; <span>🎧</span> Low-stim
         </span>
-        <span className="text-[8px] text-slate-400 leading-tight">Avoids stairs &amp; noise</span>
+        <span className="text-xs text-slate-400 leading-tight">Avoids stairs &amp; noise</span>
       </div>
       <button
         type="button"

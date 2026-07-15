@@ -67,7 +67,7 @@ export const App: React.FC = () => {
       <header className="bg-fifa-navy border-b border-slate-800/80 px-4 py-1.5 flex items-center justify-between flex-shrink-0 z-10 shadow-md">
         <div className="flex items-baseline gap-2">
           <h1 className="text-sm font-bold tracking-widest uppercase text-white font-display">Stadium Copilot</h1>
-          <span className="text-[9px] text-fifa-gold font-semibold tracking-widest uppercase font-display select-none">· FIFA World Cup 2026</span>
+          <span className="text-xs text-fifa-gold font-semibold tracking-widest uppercase select-none">· FIFA World Cup 2026</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -77,7 +77,7 @@ export const App: React.FC = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fifa-clear opacity-75"></span>
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-fifa-clear"></span>
             </span>
-            <span className="text-[8.5px] font-bold text-fifa-clear uppercase tracking-widest hidden sm:inline">Live Simulator Feed</span>
+            <span className="text-xs font-bold text-fifa-clear uppercase tracking-widest hidden sm:inline">Live Simulator Feed</span>
           </div>
 
           {/* Theme switcher toggle button */}
@@ -105,7 +105,7 @@ export const App: React.FC = () => {
           <div className="flex items-center gap-5 select-none">
             <button
               onClick={() => setActiveTab('chat')}
-              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 ${
+              className={`pb-1 px-1 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
                 activeTab === 'chat'
                   ? 'border-fifa-clear text-slate-100'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -115,7 +115,7 @@ export const App: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('reunite')}
-              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 ${
+              className={`pb-1 px-1 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
                 activeTab === 'reunite'
                   ? 'border-fifa-clear text-slate-100'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -125,14 +125,14 @@ export const App: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('staff')}
-              className={`pb-1 px-1 text-[11px] font-display font-bold uppercase tracking-wider transition-all border-b-2 flex items-center gap-1.5 ${
+              className={`pb-1 px-1 text-xs font-bold uppercase tracking-wider transition-all border-b-2 flex items-center gap-1.5 ${
                 activeTab === 'staff'
                   ? 'border-fifa-clear text-slate-100'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
               <span>🛡️ Staff</span>
-              <span className="text-[7.5px] font-sans bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded px-1 font-bold">
+              <span className="text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded px-1.5 py-0.5 font-bold">
                 OPS
               </span>
             </button>
@@ -141,7 +141,7 @@ export const App: React.FC = () => {
           {/* Start Location Dropdown (For Chat mode only) */}
           {activeTab === 'chat' && (
             <div className="flex items-center gap-2">
-              <span className="font-bold text-fifa-gold text-[10px] uppercase tracking-wider">Start Location:</span>
+              <span className="font-bold text-fifa-gold text-xs uppercase tracking-wider">Start Location:</span>
               <select
                 value={userLocation}
                 onChange={e => setUserLocation(e.target.value)}
@@ -170,7 +170,7 @@ export const App: React.FC = () => {
           {activeTab === 'reunite' && reuniteResult && (
             <button
               onClick={clearReunite}
-              className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 hover:text-red-400 transition-colors uppercase tracking-wider"
+              className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-red-400 transition-colors uppercase tracking-wider"
             >
               <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
               Clear Meetup
@@ -180,7 +180,7 @@ export const App: React.FC = () => {
           {activeTab === 'chat' && messages.length > 0 && (
             <button
               onClick={clearChat}
-              className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 hover:text-red-400 transition-colors uppercase tracking-wider"
+              className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-red-400 transition-colors uppercase tracking-wider"
             >
               <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
               Clear Journey
@@ -249,6 +249,7 @@ export const App: React.FC = () => {
             userLocation={userLocation}
             onSelectStartLocation={setUserLocation}
             reuniteResult={activeTab === 'reunite' ? reuniteResult : null}
+            activeTab={activeTab}
           />
         </section>
       </main>
@@ -264,7 +265,7 @@ export const App: React.FC = () => {
           }`}
         >
           <MessageSquare className="h-5 w-5" strokeWidth={1.75} />
-          <span className="text-[10px] font-display uppercase tracking-wider">Assistant</span>
+          <span className="text-xs uppercase tracking-wider">Assistant</span>
         </button>
 
         <button
@@ -276,7 +277,7 @@ export const App: React.FC = () => {
           }`}
         >
           <Users className="h-5 w-5" strokeWidth={1.75} />
-          <span className="text-[10px] font-display uppercase tracking-wider">Reunite</span>
+          <span className="text-xs uppercase tracking-wider">Reunite</span>
         </button>
 
         <button
@@ -288,7 +289,7 @@ export const App: React.FC = () => {
           }`}
         >
           <ShieldAlert className="h-5 w-5" strokeWidth={1.75} />
-          <span className="text-[10px] font-display uppercase tracking-wider">Staff</span>
+          <span className="text-xs uppercase tracking-wider">Staff</span>
         </button>
 
         <button
@@ -300,7 +301,7 @@ export const App: React.FC = () => {
           }`}
         >
           <Map className="h-5 w-5" strokeWidth={1.75} />
-          <span className="text-[10px] font-display uppercase tracking-wider font-semibold">Map</span>
+          <span className="text-xs uppercase tracking-wider font-semibold">Map</span>
         </button>
       </nav>
     </div>

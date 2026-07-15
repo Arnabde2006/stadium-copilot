@@ -18,7 +18,7 @@ export const LanguageBadge: React.FC<LanguageBadgeProps> = ({ code }) => {
   const resolved = mapping[codeLower] || { label: `Lang: ${code.toUpperCase()}`, flag: '🌐' };
 
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-fifa-navy text-fifa-gold border border-fifa-gold/20 shadow-sm" title="AI Language Detection">
+    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-fifa-navy text-fifa-gold border border-fifa-gold/20 shadow-sm" title="AI Language Detection">
       <span>{resolved.flag}</span>
       <span className="opacity-90">{resolved.label}</span>
     </span>

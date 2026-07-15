@@ -87,8 +87,8 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
       <div className="flex items-center gap-2 border-b border-slate-800/80 pb-3 flex-shrink-0">
         <Users className="h-5 w-5 text-fifa-gold" strokeWidth={1.75} />
         <div>
-          <h2 className="font-display font-bold text-xs sm:text-sm tracking-widest uppercase text-white">Reunite Group Meetup</h2>
-          <p className="text-[9px] sm:text-[10px] text-slate-400">Locates optimal center-point based on walking times</p>
+          <h2 className="font-display font-bold text-sm tracking-widest uppercase text-white">Reunite Group Meetup</h2>
+          <p className="text-xs text-slate-400">Locates optimal center-point based on walking times</p>
         </div>
       </div>
 
@@ -100,7 +100,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
             className="bg-fifa-navy/40 border border-slate-850 rounded-lg p-3 flex flex-col gap-2 relative transition-all"
           >
             <div className="flex justify-between items-center select-none">
-              <span className="font-display text-[10px] font-bold text-fifa-gold uppercase tracking-widest flex items-center gap-1">
+              <span className="text-xs font-bold text-fifa-gold uppercase tracking-widest flex items-center gap-1">
                 <User className="h-3 w-3 text-fifa-gold flex-shrink-0" strokeWidth={1.75} />
                 <span>Member {index + 1}</span>
               </span>
@@ -209,7 +209,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
         )}
 
         {error && (
-          <div className="text-[11px] text-red-400 bg-red-950/20 border border-red-500/20 px-3 py-2 rounded">
+          <div className="text-xs text-red-400 bg-red-950/20 border border-red-500/20 px-3 py-2 rounded">
             {error}
           </div>
         )}
@@ -240,7 +240,7 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
           <div className="flex items-center gap-2 border-b border-slate-800/80 pb-2">
             <Star className="h-4 w-4 text-fifa-gold flex-shrink-0" strokeWidth={1.75} fill="currentColor" />
             <div>
-              <h3 className="font-display font-bold text-[10px] uppercase tracking-widest text-fifa-gold">
+              <h3 className="font-bold text-xs uppercase tracking-widest text-fifa-gold">
                 Optimized Meetup Location:
               </h3>
               <p className="text-xs font-bold text-white">
@@ -256,8 +256,8 @@ export const ReunitePanel: React.FC<ReunitePanelProps> = ({
               const startName = mInput ? getNodeName(mInput.location) : 'unknown';
 
               return (
-                <div key={res.id} className="bg-slate-900/40 border border-slate-800/50 rounded-lg p-2.5 text-[11px] space-y-1.5">
-                  <div className="flex justify-between items-center font-bold text-[10px] tracking-wide uppercase">
+                <div key={res.id} className="bg-slate-900/40 border border-slate-800/50 rounded-lg p-2.5 text-xs space-y-1.5">
+                  <div className="flex justify-between items-center font-bold text-xs tracking-wide uppercase">
                     <span className="text-white">{name} ({startName})</span>
                     <span className="text-fifa-yellow">{res.etaSeconds}s ETA</span>
                   </div>
