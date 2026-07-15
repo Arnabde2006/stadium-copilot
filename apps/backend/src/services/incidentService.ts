@@ -4,7 +4,8 @@ import { IncidentReport } from '../types';
 import { addIncident } from '../data/incidentLog';
 import graphData from '../data/stadiumGraph.json';
 
-const apiKey = process.env.GEMINI_API_KEY || '';
+const isTestEnv = process.env.NODE_ENV === 'test' || !!process.env.JEST_WORKER_ID;
+const apiKey = (!isTestEnv && process.env.GEMINI_API_KEY) || '';
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 /**
@@ -74,7 +75,7 @@ async function parseWithFallback(prompt: string): Promise<Omit<IncidentReport, '
     return getMockIncidentReport(prompt);
   }
 
-  const primaryModel = 'gemini-3.5-flash';
+  const primaryModel = 'gemini-1.5-flash';
   const fallbackModel = 'gemini-flash-latest';
 
   const config: any = {

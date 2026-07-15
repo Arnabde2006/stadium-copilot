@@ -1,13 +1,13 @@
+import dotenv from 'dotenv';
+// Bootstrap environment configurations immediately
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import dotenv from 'dotenv';
 import assistantRouter from './routes/assistant';
 import reuniteRouter from './routes/reunite';
 import staffRouter from './routes/staff';
-
-// Bootstrap environment configurations
-dotenv.config();
 
 const app = express();
 

@@ -66,8 +66,8 @@ export const App: React.FC = () => {
       {/* Top Header Navigation (Compacted vertical spacing) */}
       <header className="bg-fifa-navy border-b border-slate-800/80 px-4 py-1.5 flex items-center justify-between flex-shrink-0 z-10 shadow-md">
         <div className="flex items-baseline gap-2">
-          <h1 className="text-sm font-bold tracking-widest uppercase text-white font-display">Stadium Copilot</h1>
-          <span className="text-xs text-fifa-gold font-semibold tracking-widest uppercase select-none">· FIFA World Cup 2026</span>
+          <h1 className="text-sm font-bold tracking-widest uppercase font-display">Stadium Copilot</h1>
+          <span className="text-xs text-fifa-gold font-semibold tracking-widest uppercase select-none">FIFA World Cup 2026</span>
         </div>
 
         <div className="flex items-center gap-4">

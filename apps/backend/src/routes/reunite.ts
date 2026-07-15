@@ -37,10 +37,12 @@ router.post('/reunite', async (req: Request, res: Response) => {
         const warnings: string[] = [];
         mRoute.path.forEach(nodeId => {
           const crowd = getCrowdDensity(nodeId);
-          if (crowd.level === 'high') {
-            const node = graphData.nodes.find(n => n.id === nodeId);
-            if (node) {
+          const node = graphData.nodes.find(n => n.id === nodeId);
+          if (node) {
+            if (crowd.level === 'high') {
               warnings.push(`${node.name} is heavily congested`);
+            } else if (crowd.level === 'medium') {
+              warnings.push(`${node.name} is experiencing moderate congestion`);
             }
           }
         });

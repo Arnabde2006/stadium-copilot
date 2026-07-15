@@ -46,7 +46,12 @@ router.post('/query', async (req: Request, res: Response) => {
 
     // Step 2: Compute path if destination could be inferred
     const target = destinationNodeId || destinationCategory;
-    const route = target ? findRoute(startNode, target, !!accessibilityMode) : null;
+    const startNodeObj = graphData.nodes.find(n => n.id === startNode);
+    const isAlreadyAtCategory = startNodeObj && startNodeObj.type === destinationCategory;
+    
+    // If it's a generic category search and the user is already at that category, treat it as ambiguous/null route.
+    const shouldFindRoute = target && !(isAlreadyAtCategory && !destinationNodeId);
+    const route = shouldFindRoute ? findRoute(startNode, target, !!accessibilityMode) : null;
 
     if (route) {
       suggestedPath = route.path;
@@ -67,15 +72,28 @@ router.post('/query', async (req: Request, res: Response) => {
     } else {
       // General response or route not resolved
       const densities = getAllCrowdDensities();
-      const highCongestionNames = densities
-        .filter(d => d.level === 'high')
-        .map(d => {
-          const node = graphData.nodes.find(n => n.id === d.nodeId);
-          return node ? node.name : d.nodeId;
-        });
+      const highCongestion = densities.filter(d => d.level === 'high');
+      const mediumCongestion = densities.filter(d => d.level === 'medium');
 
-      if (highCongestionNames.length > 0) {
-        congestionAlert = `Heavy congestion detected at: ${highCongestionNames.join(', ')}`;
+      const highNames = highCongestion
+        .map(d => graphData.nodes.find(n => n.id === d.nodeId)?.name || d.nodeId);
+      const mediumNames = mediumCongestion
+        .map(d => graphData.nodes.find(n => n.id === d.nodeId)?.name || d.nodeId);
+
+      const alerts: string[] = [];
+      const promptWarnings: string[] = [];
+
+      if (highNames.length > 0) {
+        alerts.push(`Heavy congestion detected at: ${highNames.join(', ')}`);
+        highNames.forEach(name => promptWarnings.push(`${name} is heavily congested`));
+      }
+      if (mediumNames.length > 0) {
+        alerts.push(`Moderate congestion detected at: ${mediumNames.join(', ')}`);
+        mediumNames.forEach(name => promptWarnings.push(`${name} is experiencing moderate congestion`));
+      }
+
+      if (alerts.length > 0) {
+        congestionAlert = alerts.join('. ');
       }
 
       answer = await generateGuidance(
@@ -83,7 +101,7 @@ router.post('/query', async (req: Request, res: Response) => {
         startNode,
         [],
         0,
-        highCongestionNames.map(name => `${name} is heavily congested`),
+        promptWarnings,
         detectedLanguage,
         !!accessibilityMode
       );

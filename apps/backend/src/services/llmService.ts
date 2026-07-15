@@ -4,7 +4,8 @@ import { LLMAnalysis } from '../types';
 import graphData from '../data/stadiumGraph.json';
 import { getAllCrowdDensities } from '../data/crowdDensity';
 
-const apiKey = process.env.GEMINI_API_KEY || '';
+const isTestEnv = process.env.NODE_ENV === 'test' || !!process.env.JEST_WORKER_ID;
+const apiKey = (!isTestEnv && process.env.GEMINI_API_KEY) || '';
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 /**
@@ -17,26 +18,26 @@ function getMockResponse(prompt: string, systemInstruction: string): string {
     let destinationNodeId: string | null = null;
     let detectedLanguage = 'en';
 
-    if (lower.includes('baño') || lower.includes('bano') || lower.includes('toilet') || lower.includes('restroom') || lower.includes('wc') || lower.includes('restrooms') || lower.includes('bathroom') || lower.includes('bathrooms') || lower.includes('washroom')) {
+    if (/\b(baño|bano|toilet|restroom|wc|bathroom|washroom)s?\b/.test(lower)) {
       destinationCategory = 'restroom';
-    } else if (lower.includes('taco') || lower.includes('burger') || lower.includes('food') || lower.includes('eat') || lower.includes('stall') || lower.includes('drink') || lower.includes('sips') || lower.includes('beer') || lower.includes('hungry')) {
+    } else if (/\b(taco|burger|food|eat|stall|drink|sip|beer|hungry)s?\b/.test(lower)) {
       destinationCategory = 'food';
       if (lower.includes('taco')) destinationNodeId = 'food-stall-a';
       else if (lower.includes('burger') || lower.includes('barn')) destinationNodeId = 'food-stall-b';
       else if (lower.includes('drink') || lower.includes('sip') || lower.includes('coffee')) destinationNodeId = 'food-stall-c';
-    } else if (lower.includes('gate') || lower.includes('entrance') || lower.includes('door')) {
+    } else if (/\b(gate|entrance|door)s?\b/.test(lower)) {
       destinationCategory = 'gate';
       if (lower.includes('gate a')) destinationNodeId = 'gate-a';
       else if (lower.includes('gate b')) destinationNodeId = 'gate-b';
       else if (lower.includes('gate c')) destinationNodeId = 'gate-c';
       else if (lower.includes('gate d')) destinationNodeId = 'gate-d';
-    } else if (lower.includes('exit')) {
+    } else if (/\b(exit)s?\b/.test(lower)) {
       destinationCategory = 'exit';
       if (lower.includes('east')) destinationNodeId = 'exit-east';
       else if (lower.includes('west')) destinationNodeId = 'exit-west';
-    } else if (lower.includes('section') || lower.includes('sec') || lower.includes('seating') || lower.includes('stand')) {
+    } else if (/\b(section|sec|seating|stand)s?\b/.test(lower)) {
       destinationCategory = 'section';
-      const secMatch = lower.match(/10[0-5]/);
+      const secMatch = lower.match(/\b10[0-5]\b/);
       if (secMatch) destinationNodeId = `sec-${secMatch[0]}`;
     }
 
@@ -54,14 +55,25 @@ function getMockResponse(prompt: string, systemInstruction: string): string {
   }
 
   // Parse path out of the generation prompt for mock responses
-  const pathMatch = prompt.match(/Path: (.*)/);
-  const pathText = pathMatch ? pathMatch[1] : 'unknown';
+  const pathMatch = prompt.match(/Recommended Path: (.*)/) || prompt.match(/Path: (.*)/);
+  const pathText = pathMatch ? pathMatch[1].trim() : '';
   const langMatch = prompt.match(/Language Code: (.*)/);
   const lang = langMatch ? langMatch[1].trim() : 'en';
   const warningMatch = prompt.match(/Warnings: (.*)/);
-  const warningText = warningMatch ? warningMatch[1] : 'None';
+  const warningText = warningMatch ? warningMatch[1].trim() : 'None';
 
   const isAccessibility = prompt.includes('Accessibility Mode: Active');
+  const isAmbiguous = pathText === '' || pathText === 'unknown' || pathText === 'none';
+
+  if (isAmbiguous) {
+    if (lang === 'es') {
+      return "Estoy aquí para ayudarte a navegar por el estadio. ¿A dónde te gustaría ir? Por favor, dime tu sección, puerta o destino final.";
+    } else if (lang === 'fr') {
+      return "Je suis là pour vous aider à naviguer dans le stade. Où aimeriez-vous aller? Veuillez préciser votre section, porte ou destination.";
+    } else {
+      return "I'm here to help you navigate the stadium. Where would you like to go? Please specify a section, gate, restroom, or food stall.";
+    }
+  }
 
   if (lang === 'es') {
     let ans = `Para llegar a tu destino, sigue la ruta recomendada: ${pathText}.`;
@@ -107,7 +119,7 @@ async function generateWithFallback(systemInstruction: string, prompt: string, r
     return getMockResponse(prompt, systemInstruction);
   }
 
-  const primaryModel = 'gemini-3.5-flash';
+  const primaryModel = 'gemini-1.5-flash';
   const fallbackModel = 'gemini-flash-latest';
 
   const config: any = {

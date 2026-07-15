@@ -38,26 +38,30 @@ export const useVoiceInput = (
     rec.lang = 'en-US';
 
     rec.onresult = (event: any) => {
-      let finalTranscript = '';
+      let newFinalText = '';
+      let interimText = '';
+
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
+          newFinalText += event.results[i][0].transcript;
         }
       }
 
-      if (finalTranscript) {
-        sessionFinalTextRef.current = `${sessionFinalTextRef.current} ${finalTranscript}`.trim();
-        onTranscriptRef.current(finalTranscript.trim());
-      }
-
-      let currentSessionText = '';
       for (let i = 0; i < event.results.length; ++i) {
-        currentSessionText += event.results[i][0].transcript;
+        if (!event.results[i].isFinal) {
+          interimText += event.results[i][0].transcript;
+        }
       }
 
-      const fullText = `${accumulatedFinalText.current} ${currentSessionText}`.trim();
+      if (newFinalText) {
+        sessionFinalTextRef.current = `${sessionFinalTextRef.current} ${newFinalText}`.trim();
+        const totalFinal = `${accumulatedFinalText.current} ${sessionFinalTextRef.current}`.trim();
+        onTranscriptRef.current(totalFinal);
+      }
+
+      const totalFull = `${accumulatedFinalText.current} ${sessionFinalTextRef.current} ${interimText}`.trim();
       if (onInterimTranscriptRef.current) {
-        onInterimTranscriptRef.current(fullText);
+        onInterimTranscriptRef.current(totalFull);
       }
     };
 

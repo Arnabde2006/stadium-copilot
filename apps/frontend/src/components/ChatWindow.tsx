@@ -24,11 +24,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   // Consume shared speech recognition hook with interim updates
   const { isListening, toggleListening, isSupported } = useVoiceInput(
     (text) => {
-      setInputValue(_ => {
-        const updated = `${baseInputRef.current} ${text}`.trim();
-        baseInputRef.current = updated;
-        return updated;
-      });
+      setInputValue(`${baseInputRef.current} ${text}`.trim());
     },
     (text) => {
       setInputValue(`${baseInputRef.current} ${text}`.trim());
