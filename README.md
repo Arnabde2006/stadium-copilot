@@ -144,8 +144,14 @@ The entire application can be deployed as a single Vercel project using the work
 
 - **Build Target**: The frontend is compiled and served as a static single-page application (SPA) at the root domain (`/`).
 - **Serverless Backend**: The Express application routes all `/api/*` requests to a serverless function adapter ([api/index.ts](file:///d:/Promtwars/Stadium%20Copilot/api/index.ts)).
-- **Environment Variables**: Configure the following Environment Variable in your Vercel Project Dashboard:
+- **Environment Variables**: Configure the following Environment Variables in your Vercel Project Dashboard (Settings → Environment Variables):
   - `GEMINI_API_KEY`: Your Google Gemini API Key.
+  - `STAFF_ACCESS_CODE`: The passcode required to authenticate Staff mode on the backend (e.g. `demo-passcode`).
+  - `VITE_STAFF_DEMO_CODE_HINT`: The passcode hint shown on the frontend passcode gate (should be identical to `STAFF_ACCESS_CODE` for demo purposes). **This is NOT automatically shared from the backend's variable, and must be configured as a separate entry.**
+  
+  > [!IMPORTANT]
+  > Because Vite environment variables are statically compiled into the client bundle at build-time, **any changes to `VITE_STAFF_DEMO_CODE_HINT` require a fresh deployment (rebuild) on Vercel to take effect.** Simply restarting or refreshing the browser against a stale build will not reflect the changes.
+
 - **Crowd Simulator Behavioral Adjustments**: On Vercel, the backend automatically detects the stateless serverless environment and disables the persistent `setInterval` daemon. Instead, it dynamically generates deterministic and realistic crowd densities using a 10-second time-bucketed seed, ensuring the interactive map routes fans dynamic paths reliably.
 
 ### 2. Docker & Google Cloud Run (Alternative Deployment)

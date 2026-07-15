@@ -157,7 +157,7 @@ export const StaffPanel: React.FC = () => {
   });
 
   if (!isAuthenticated) {
-    const demoHint = (import.meta as any).env.VITE_STAFF_DEMO_CODE_HINT;
+    const demoHint = import.meta.env.VITE_STAFF_DEMO_CODE_HINT;
     return (
       <div className="flex flex-col h-full bg-fifa-dark/10 rounded-xl border border-slate-700/45 overflow-hidden shadow-md">
         {/* Panel Header */}
