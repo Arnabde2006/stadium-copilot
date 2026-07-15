@@ -292,7 +292,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     const dy = node.y - 250;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle = Math.atan2(dy, dx);
-    const offset = 20; // Push outward by 20px (descaled to prevent clipping)
+    const offset = 35; // Increased from 20 to 35 to provide clearance from status badge
     
     return {
       x: Math.round(250 + (distance + offset) * Math.cos(angle)),
@@ -368,6 +368,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
       : 'stroke-slate-700/60 stroke-[1]';
 
     const hoverStyle = 'cursor-pointer hover:scale-115 hover:brightness-125 hover:stroke-white hover:stroke-[2] font-semibold outline-none';
+    const nonInteractiveStyle = 'transition-all duration-300';
 
     switch (node.type) {
       case 'gate':
@@ -393,11 +394,8 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             points={`${node.x},${node.y - 14} ${node.x + 14},${node.y} ${node.x},${node.y + 14} ${node.x - 14},${node.y}`}
             fill={nodeFill}
             stroke={isCongested ? 'var(--fifa-congested)' : undefined}
-            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
-            tabIndex={0}
+            className={`${nonInteractiveStyle} ${ringStyle}`}
             aria-label={`Exit ${node.name}`}
-            onKeyDown={(e) => handleKeyDown(e, node.id)}
-            onClick={() => onSelectStartLocation(node.id)}
           />
         );
       case 'restroom':
@@ -408,11 +406,8 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             r={10}
             fill={nodeFill}
             stroke={isCongested ? 'var(--fifa-congested)' : undefined}
-            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
-            tabIndex={0}
+            className={`${nonInteractiveStyle} ${ringStyle}`}
             aria-label={`Restroom ${node.name}`}
-            onKeyDown={(e) => handleKeyDown(e, node.id)}
-            onClick={() => onSelectStartLocation(node.id)}
           />
         );
       case 'food':
@@ -423,11 +418,8 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             r={11}
             fill={nodeFill}
             stroke={isCongested ? 'var(--fifa-congested)' : undefined}
-            className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
-            tabIndex={0}
+            className={`${nonInteractiveStyle} ${ringStyle}`}
             aria-label={`Food Stall ${node.name}`}
-            onKeyDown={(e) => handleKeyDown(e, node.id)}
-            onClick={() => onSelectStartLocation(node.id)}
           />
         );
       default: // section
@@ -459,41 +451,70 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     if (node.type === 'section') {
       badgeX = node.x + 20;
       badgeY = node.y - 15;
-    } else if (node.type === 'gate' || node.type === 'exit') {
-      badgeX = node.x + 16;
-      badgeY = node.y - 16;
     }
     
-    let symbol = '✓';
-    let badgeBg = 'var(--fifa-clear)'; // Turf Green Clear
-    if (level === 'medium') {
-      symbol = '▲';
-      badgeBg = 'var(--fifa-moderate)'; // Gold
-    } else if (level === 'high') {
-      symbol = '⚠';
-      badgeBg = 'var(--fifa-congested)'; // Red
+    if (level === 'low') {
+      return (
+        <g className="select-none pointer-events-none">
+          <circle
+            cx={badgeX}
+            cy={badgeY}
+            r={9}
+            fill="var(--fifa-clear)"
+            stroke="#121826"
+            strokeWidth={1.5}
+          />
+          <text
+            x={badgeX}
+            y={badgeY + 3.5}
+            textAnchor="middle"
+            fill="#E8E6E0"
+            className="font-sans font-bold text-[10px]"
+          >
+            ✓
+          </text>
+        </g>
+      );
     }
+    
+    const badgeBg = level === 'medium' ? 'var(--fifa-moderate)' : 'var(--fifa-congested)';
     
     return (
       <g className="select-none pointer-events-none">
-        <circle
-          cx={badgeX}
-          cy={badgeY}
-          r={9}
+        <polygon
+          points={`${badgeX},${badgeY - 10} ${badgeX + 11},${badgeY + 8} ${badgeX - 11},${badgeY + 8}`}
           fill={badgeBg}
           stroke="#121826"
           strokeWidth={1.5}
         />
         <text
           x={badgeX}
-          y={badgeY + 4}
+          y={badgeY + 5}
           textAnchor="middle"
           fill="#E8E6E0"
-          className="font-sans font-bold text-map-label"
+          className="font-sans font-bold text-[10px]"
         >
-          {symbol}
+          !
         </text>
       </g>
+    );
+  };
+
+  const renderLegendIcon = (type: 'clear' | 'moderate' | 'congested') => {
+    if (type === 'clear') {
+      return (
+        <svg width="18" height="18" className="inline-block mr-1">
+          <circle cx="9" cy="9" r="8" fill="var(--fifa-clear)" stroke="#121826" strokeWidth={1} />
+          <text x="9" y="12" textAnchor="middle" fill="#E8E6E0" className="font-sans font-bold text-[10px]">✓</text>
+        </svg>
+      );
+    }
+    const bg = type === 'moderate' ? 'var(--fifa-moderate)' : 'var(--fifa-congested)';
+    return (
+      <svg width="18" height="18" className="inline-block mr-1">
+        <polygon points="9,1 18,16 0,16" fill={bg} stroke="#121826" strokeWidth={1} />
+        <text x="9" y="13" textAnchor="middle" fill="#E8E6E0" className="font-sans font-bold text-[10px]">!</text>
+      </svg>
     );
   };
 
@@ -502,13 +523,13 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
       <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-400 mb-3 px-1 select-none">
         <span className="flex flex-wrap items-center gap-2 tracking-wider uppercase text-slate-400">
           <span className="flex items-center gap-1">
-            <span className="flex items-center justify-center w-4 h-4 bg-fifa-clear text-xs text-white font-bold rounded-sm">✓</span> Clear
+            {renderLegendIcon('clear')} Clear
           </span>
           <span className="flex items-center gap-1 ml-1.5">
-            <span className="flex items-center justify-center w-4 h-4 bg-fifa-moderate text-xs text-white font-bold rounded-sm">▲</span> Moderate
+            {renderLegendIcon('moderate')} Moderate
           </span>
           <span className="flex items-center gap-1 ml-1.5">
-            <span className="flex items-center justify-center w-4 h-4 bg-fifa-congested text-xs text-white font-bold rounded-sm">⚠</span> Congested
+            {renderLegendIcon('congested')} Congested
           </span>
         </span>
         <span className="text-fifa-gold uppercase tracking-wider font-semibold">Click node to change Start Position</span>
@@ -689,14 +710,32 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                 {/* Colorblind-Safe Congestion Badge */}
                 {renderCongestionBadge(node)}
 
+                {/* Node Text Label Background Pill Chip for non-section nodes */}
+                {node.type !== 'section' && (() => {
+                  const labelText = node.name.split(' (')[0];
+                  return (
+                    <rect
+                      x={getLabelCoords(node).x - (labelText.length * 3.5 + 6)}
+                      y={getLabelCoords(node).y - 9}
+                      width={labelText.length * 7 + 12}
+                      height={14}
+                      rx={4}
+                      fill="var(--surface-card)"
+                      stroke="var(--surface-elevated)"
+                      strokeWidth={1}
+                      className="opacity-90 shadow-sm"
+                    />
+                  );
+                })()}
+
                 {/* Node Text Label (Shifted radially outward for clear readability) */}
                 <text
                   x={getLabelCoords(node).x}
                   y={getLabelCoords(node).y}
                   textAnchor="middle"
-                  fill={node.type === 'section' ? '#F4F1EA' : '#8B93A7'}
+                  fill={node.type === 'section' ? '#F4F1EA' : 'var(--text-primary)'}
                   className="select-none pointer-events-none font-sans uppercase font-bold tracking-wider text-map-label"
-                  style={{ textShadow: '0 1px 2px rgba(10, 15, 26, 0.95), 0 0 1px rgba(10, 15, 26, 0.95)' }}
+                  style={node.type === 'section' ? { textShadow: '0 1px 2px rgba(10, 15, 26, 0.95), 0 0 1px rgba(10, 15, 26, 0.95)' } : undefined}
                 >
                   {node.type === 'section' ? node.name.replace('Section ', '') : node.name.split(' (')[0]}
                 </text>

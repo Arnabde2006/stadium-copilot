@@ -185,12 +185,12 @@ body {
 
 /* Contrast Header and Route Summary Card */
 [data-theme="light"] header {
-  background-color: var(--accent-dark-navy) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid rgba(59, 111, 224, 0.08) !important;
 }
 
 [data-theme="light"] header h1 {
-  color: #FFFFFF !important;
+  color: var(--accent-dark-navy) !important;
 }
 
 [data-theme="light"] header span {
@@ -198,14 +198,14 @@ body {
 }
 
 [data-theme="light"] header button {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #FFFFFF !important;
+  background-color: rgba(59, 111, 224, 0.08) !important;
+  border: 1px solid rgba(59, 111, 224, 0.15) !important;
+  color: var(--accent-primary) !important;
 }
 
 [data-theme="light"] header button:hover {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-  color: #FFFFFF !important;
+  background-color: rgba(59, 111, 224, 0.15) !important;
+  color: var(--accent-primary) !important;
 }
 
 [data-theme="light"] .border-l-fifa-gold {
@@ -235,6 +235,18 @@ body {
 /* Text color contrast adaptations */
 [data-theme="light"] .text-\[\#E8E6E0\] {
   color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .text-slate-200 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] button[role="switch"] {
+  background-color: #E2E8F0 !important;
+}
+
+[data-theme="light"] button[role="switch"][aria-checked="true"] {
+  background-color: var(--accent-primary) !important;
 }
 
 [data-theme="light"] .text-slate-300,
@@ -323,12 +335,13 @@ body {
   display: inline-block !important;
   white-space: nowrap !important;
   width: max-content !important;
+  padding-left: 100% !important;
   animation: marquee-scroll 25s linear infinite;
 }
 
 @keyframes marquee-scroll {
   0% {
-    transform: translate3d(100vw, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
     transform: translate3d(-100%, 0, 0);
