@@ -21,17 +21,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const baseInputRef = useRef('');
 
-  // Keep track of input value before speech session started
-  useEffect(() => {
-    if (isListening) {
-      baseInputRef.current = inputValue;
-    }
-  }, [isListening]);
-
   // Consume shared speech recognition hook with interim updates
   const { isListening, toggleListening, isSupported } = useVoiceInput(
     (text) => {
-      setInputValue(prev => {
+      setInputValue(_ => {
         const updated = `${baseInputRef.current} ${text}`.trim();
         baseInputRef.current = updated;
         return updated;
@@ -41,6 +34,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       setInputValue(`${baseInputRef.current} ${text}`.trim());
     }
   );
+
+  // Keep track of input value before speech session started
+  useEffect(() => {
+    if (isListening) {
+      baseInputRef.current = inputValue;
+    }
+  }, [isListening]);
 
   const handleSend = (e: React.FormEvent): void => {
     e.preventDefault();
