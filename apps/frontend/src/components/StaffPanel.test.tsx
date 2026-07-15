@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import StaffPanel from './StaffPanel';
 
 const mockIncidents = [
@@ -14,18 +14,35 @@ const mockIncidents = [
   }
 ];
 
-// Mock the useStaffReports hook to test component rendering in isolation
+// Create mocks for the hooks
+const mockLogin = vi.fn();
+const mockLogout = vi.fn();
+const mockReportIncident = vi.fn();
+
+vi.mock('../hooks/useStaffAuth', () => ({
+  useStaffAuth: () => ({
+    token: 'mock-token',
+    isAuthenticated: true,
+    login: mockLogin,
+    logout: mockLogout,
+  })
+}));
+
 vi.mock('../hooks/useStaffReports', () => ({
   useStaffReports: () => ({
     incidents: mockIncidents,
     isLoading: false,
     error: null,
-    reportIncident: vi.fn()
+    reportIncident: mockReportIncident
   })
 }));
 
 describe('StaffPanel Component Tests', () => {
-  it('should render the panel title, input, and incident feed cards', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should render the panel title, input, and incident feed cards when authenticated', () => {
     render(<StaffPanel />);
     
     // Verify header title
@@ -36,9 +53,10 @@ describe('StaffPanel Component Tests', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     
     // Verify mock incident card details render correctly
-    expect(screen.getByText('Someone fainted near the stairs.')).toBeInTheDocument();
-    expect(screen.getByText('Section 104')).toBeInTheDocument();
-    expect(screen.getByText('medical')).toBeInTheDocument();
-    expect(screen.getByText('high')).toBeInTheDocument();
+    expect(screen.getAllByText('Someone fainted near the stairs.')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Section 104')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('medical')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('high')[0]).toBeInTheDocument();
   });
 });
+

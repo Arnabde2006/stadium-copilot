@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { extractIntent, generateGuidance } from '../services/llmService';
 import { findRoute } from '../services/routingService';
 import { getAllCrowdDensities } from '../data/crowdDensity';
+import { getIncidents } from '../data/incidentLog';
 import graphData from '../data/stadiumGraph.json';
 
 const router = Router();
@@ -20,6 +21,25 @@ router.get('/graph', (req: Request, res: Response) => {
  */
 router.get('/density', (req: Request, res: Response) => {
   return res.json(getAllCrowdDensities());
+});
+
+/**
+ * GET /api/assistant/active-alerts
+ * Serves the active high-urgency incident alerts for the public jumbotron ticker
+ */
+router.get('/active-alerts', (req: Request, res: Response) => {
+  try {
+    const incidents = getIncidents();
+    const activeAlerts = incidents.filter(inc => {
+      if (inc.urgency !== 'high') return false;
+      const elapsedMs = Date.now() - new Date(inc.timestamp).getTime();
+      return elapsedMs <= 15 * 60 * 1000;
+    });
+    return res.json(activeAlerts);
+  } catch (error) {
+    console.error('[AssistantRoute] Failed to retrieve active alerts:', error);
+    return res.status(500).json({ error: 'An unexpected internal error occurred' });
+  }
 });
 
 /**

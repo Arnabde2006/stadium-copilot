@@ -1,4 +1,5 @@
 import { StadiumGraph, CrowdDensity, QueryResponse, ReuniteMemberInput, ReuniteResponse, IncidentReport } from '../types';
+import { getStaffToken } from '../auth/staffToken';
 
 const API_PREFIX = '/api/assistant';
 
@@ -73,11 +74,17 @@ export async function reuniteMembers(
  * Submit an incident report
  */
 export async function reportIncident(input: string): Promise<IncidentReport> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = getStaffToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch('/api/staff/report', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({ input }),
   });
 
@@ -92,10 +99,30 @@ export async function reportIncident(input: string): Promise<IncidentReport> {
  * Retrieve all logged incidents
  */
 export async function getIncidents(): Promise<IncidentReport[]> {
-  const response = await fetch('/api/staff/reports');
+  const headers: Record<string, string> = {};
+  const token = getStaffToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch('/api/staff/reports', {
+    headers,
+  });
   if (!response.ok) {
     throw new Error('Failed to retrieve incident reports');
   }
   return response.json();
 }
+
+/**
+ * Fetch active high-urgency incident alerts for the public jumbotron ticker
+ */
+export async function fetchActiveAlerts(): Promise<IncidentReport[]> {
+  const response = await fetch('/api/assistant/active-alerts');
+  if (!response.ok) {
+    throw new Error('Could not retrieve active alerts');
+  }
+  return response.json();
+}
+
 

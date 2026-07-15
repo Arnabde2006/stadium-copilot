@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Message, StadiumNode, StadiumEdge, CrowdDensity } from '../types';
-import { fetchGraph, fetchDensities, queryAssistant } from '../lib/api';
+import { Message, StadiumNode, StadiumEdge, CrowdDensity, IncidentReport } from '../types';
+import { fetchGraph, fetchDensities, queryAssistant, fetchActiveAlerts } from '../lib/api';
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [nodes, setNodes] = useState<StadiumNode[]>([]);
   const [edges, setEdges] = useState<StadiumEdge[]>([]);
   const [densities, setDensities] = useState<CrowdDensity[]>([]);
+  const [activeAlerts, setActiveAlerts] = useState<IncidentReport[]>([]);
   const [suggestedPath, setSuggestedPath] = useState<string[]>([]);
   const [congestionAlert, setCongestionAlert] = useState<string | undefined>(undefined);
   const [userLocation, setUserLocation] = useState<string>('sec-100'); // Default start location
@@ -29,19 +30,23 @@ export function useChat() {
     loadGraphSpec();
   }, []);
 
-  // Poll the backend simulator for live crowd density updates every 5 seconds
+  // Poll the backend simulator for live crowd density and active alerts updates every 5 seconds
   useEffect(() => {
-    async function pullDensities() {
+    async function pullDensitiesAndAlerts() {
       try {
-        const data = await fetchDensities();
-        setDensities(data);
+        const [densityData, alertData] = await Promise.all([
+          fetchDensities(),
+          fetchActiveAlerts().catch(() => [] as IncidentReport[])
+        ]);
+        setDensities(densityData);
+        setActiveAlerts(alertData);
       } catch (err) {
-        console.error('Error fetching live crowd simulation data:', err);
+        console.error('Error fetching live crowd/alert simulation data:', err);
       }
     }
 
-    pullDensities(); // Immediate fetch
-    const timer = setInterval(pullDensities, 5000);
+    pullDensitiesAndAlerts(); // Immediate fetch
+    const timer = setInterval(pullDensitiesAndAlerts, 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -107,6 +112,7 @@ export function useChat() {
     nodes,
     edges,
     densities,
+    activeAlerts,
     suggestedPath,
     congestionAlert,
     userLocation,

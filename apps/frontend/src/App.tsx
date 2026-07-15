@@ -8,6 +8,7 @@ import AccessibilityToggle from './components/AccessibilityToggle';
 import ReunitePanel from './components/ReunitePanel';
 import StaffPanel from './components/StaffPanel';
 import RouteSummary from './components/RouteSummary';
+import EmergencyFooter from './components/EmergencyFooter';
 import { MessageSquare, Users, ShieldAlert, Map, Trash2, Sun, Moon } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -16,6 +17,7 @@ export const App: React.FC = () => {
     nodes,
     edges,
     densities,
+    activeAlerts,
     suggestedPath,
     congestionAlert,
     userLocation,
@@ -96,7 +98,7 @@ export const App: React.FC = () => {
       </header>
 
       {/* Dynamic Alerts Banner */}
-      <CrowdAlertBanner densities={densities} nodes={nodes} />
+      <CrowdAlertBanner densities={densities} nodes={nodes} activeAlerts={activeAlerts} />
 
       {/* Selector Toolbar (Aligned to 8px Spacing Grid) */}
       <div className="bg-fifa-navy/40 px-4 py-2 border-b border-slate-800/60 flex flex-wrap gap-4 items-center justify-between flex-shrink-0 text-xs text-slate-300">
@@ -304,6 +306,7 @@ export const App: React.FC = () => {
           <span className="text-xs uppercase tracking-wider font-semibold">Map</span>
         </button>
       </nav>
+      {activeTab !== 'staff' && <EmergencyFooter />}
     </div>
   );
 };

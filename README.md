@@ -83,13 +83,39 @@ Honesty and clear boundaries are crucial for a solid MVP:
 ## 🛡️ Staff Mode (Incident Reporting Pipeline)
 
 Stadium Copilot features an internal operations workspace dedicated to volunteers and stadium staff:
-1. **Free-Text & Voice Reporting**: Staff members can type or use the **Web Speech API** microphone voice input to describe issues they observe (e.g. medical emergencies, facility leaks, crowd blocks).
-2. **GenAI Structuring Pipeline**: The text is parsed by Gemini via a specialized operational instruction set. It extracts and standardizes:
+1. **Passcode Gate & Session Authentication**: Access to the Staff panel is protected by a passcode gate. The passcode is verified securely on the backend using timing-safe comparisons (`crypto.timingSafeEqual`) to prevent timing attacks. On verification, a short-lived session token (4-hour lifetime) is generated, which must be passed in the `Authorization: Bearer <token>` header for subsequent report submissions and polling. The token is stored strictly in frontend memory and cleared upon page reload, tab close, or manual logout.
+2. **Free-Text & Voice Reporting**: Staff members can type or use the **Web Speech API** microphone voice input to describe issues they observe (e.g. medical emergencies, facility leaks, crowd blocks).
+3. **GenAI Structuring Pipeline**: The text is parsed by Gemini via a specialized operational instruction set. It extracts and standardizes:
    - **Category**: Classifies incidents into exactly one of `crowding`, `medical`, `security`, `facility`, or `other`.
    - **Location**: Maps the description to the closest known node from the stadium layout graph (e.g., matching "leaking toilet" to "Restroom 2").
    - **Urgency**: Detects urgency level (`low`, `medium`, `high`) conservatively. Any query referring to injuries, bleeding, violence, danger, or weapons is automatically flagged as `high`.
    - **Summary**: Creates a clean, single-sentence summary of the ticket.
-3. **Live Operations Feed**: Logged incidents are dynamically loaded into an operational status feed, polling every 5 seconds to provide staff with a real-time ticketing dashboard.
+4. **Live Operations Feed & Active Alerts**: Logged incidents are dynamically loaded into an operational status feed, polling every 5 seconds to provide staff with a real-time ticketing dashboard. High-urgency incidents reported in the last 15 minutes are prominently highlighted at the top of the Staff Panel in a dedicated **Active Emergency Alerts** section with visual warnings and a pulse animation.
+5. **Jumbotron Ticker Integration**: Active high-urgency incidents are pushed to a public ticker banner, prefixed with `OPS ALERT: [incident summary] (Location: [incident location])`, merging seamlessly with crowd density alerts or defaulting to a status message if all is clear.
+
+---
+
+## 🚨 Emergency Footer
+
+To ensure fan safety, a persistent **Emergency Numbers Footer** is displayed at the bottom of the client application across all fan-facing views (Assistant, Reunite, and Map screens), but hidden inside Staff mode. It shows direct contacts for:
+- **Primary emergency dispatch**: `911`
+- **Venue operations security**: `Stadium Security: Ext. 4357` (configured in [EmergencyFooter.tsx](file:///d:/Promtwars/Stadium%20Copilot/apps/frontend/src/components/EmergencyFooter.tsx))
+
+---
+
+## ⚙️ Environment Variables
+
+The workspace uses the following environment variables. Example configurations are provided in the respective `.env.example` files:
+
+### Backend (`apps/backend/.env`)
+- `PORT`: Port on which the API server runs (default: `3000`).
+- `GEMINI_API_KEY`: Your Google Gemini API Key for processing queries and incident logs.
+- `STAFF_ACCESS_CODE`: The secret passcode used to access the staff panel (e.g. `demo-passcode`).
+- `STAFF_TOKEN_SECRET`: HMAC signing secret used for session tokens.
+
+### Frontend (`apps/frontend/.env`)
+- `VITE_STAFF_DEMO_CODE_HINT`: Displays the passcode hint directly below the input field on the Staff login page for evaluation/demo purposes. **This environment variable must be left unset in production deployments** to hide the hint.
+
 
 ---
 

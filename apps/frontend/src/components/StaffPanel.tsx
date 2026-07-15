@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStaffReports } from '../hooks/useStaffReports';
+import { useStaffAuth } from '../hooks/useStaffAuth';
 import {
   Shield,
   Heart,
@@ -24,10 +25,16 @@ function formatRelativeTime(dateString: string): string {
 }
 
 export const StaffPanel: React.FC = () => {
-  const { incidents, isLoading, error, reportIncident } = useStaffReports();
+  const { token, isAuthenticated, login, logout } = useStaffAuth();
+  const { incidents, isLoading, error, reportIncident } = useStaffReports(token);
   const [inputValue, setInputValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [relativeTimes, setRelativeTimes] = useState<Record<string, string>>({});
+
+  // Passcode entry form state
+  const [passcode, setPasscode] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   // Web Speech API Integration
   const SpeechRecognition =
@@ -102,6 +109,20 @@ export const StaffPanel: React.FC = () => {
     }
   };
 
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passcode.trim() || isAuthenticating) return;
+    setIsAuthenticating(true);
+    setAuthError(null);
+    try {
+      await login(passcode);
+    } catch (err: any) {
+      setAuthError(err.message || 'Incorrect passcode');
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'medical':
@@ -128,6 +149,85 @@ export const StaffPanel: React.FC = () => {
     }
   };
 
+  // Filter incidents for high urgency and logged in last 15 minutes
+  const activeStaffAlerts = incidents.filter(inc => {
+    if (inc.urgency !== 'high') return false;
+    const elapsedMinutes = (Date.now() - new Date(inc.timestamp).getTime()) / 60000;
+    return elapsedMinutes <= 15;
+  });
+
+  if (!isAuthenticated) {
+    const demoHint = (import.meta as any).env.VITE_STAFF_DEMO_CODE_HINT;
+    return (
+      <div className="flex flex-col h-full bg-fifa-dark/10 rounded-xl border border-slate-700/45 overflow-hidden shadow-md">
+        {/* Panel Header */}
+        <div className="bg-slate-800/40 px-4 py-3 border-b border-slate-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-fifa-gold" />
+            <span className="font-bold text-xs uppercase tracking-widest text-slate-200">Operations Command</span>
+          </div>
+          <span className="bg-amber-500/10 text-amber-400 text-xs font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-widest">
+            Restricted
+          </span>
+        </div>
+
+        {/* Passcode Form */}
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-fifa-navy/10 relative">
+          <div className="w-full max-w-sm bg-fifa-card/65 backdrop-blur-md border border-slate-800/70 rounded-2xl p-6 shadow-xl space-y-6">
+            <div className="text-center space-y-2">
+              <div className="inline-flex p-3 bg-fifa-gold/10 text-fifa-gold rounded-full border border-fifa-gold/20">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-100 tracking-wide">Staff Authentication</h3>
+              <p className="text-xs text-slate-400 max-w-[280px] mx-auto">
+                Access is restricted to authorized venue staff. Please enter the operations passcode.
+              </p>
+            </div>
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Passcode</label>
+                <input
+                  type="password"
+                  value={passcode}
+                  onChange={e => setPasscode(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-fifa-dark border border-slate-800/80 rounded-xl px-4 py-2.5 text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-fifa-accent"
+                  autoFocus
+                />
+              </div>
+
+              {authError && (
+                <div className="bg-red-950/30 border border-red-500/20 text-red-200 text-xs px-3 py-2.5 rounded-lg flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                  <span>{authError}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={!passcode.trim() || isAuthenticating}
+                className="w-full py-2.5 rounded-xl bg-fifa-blue hover:bg-fifa-accent text-white font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-2"
+              >
+                {isAuthenticating ? (
+                  <span className="block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <span>Verify Passcode</span>
+                )}
+              </button>
+            </form>
+
+            {demoHint && (
+              <div className="text-xs text-slate-500 bg-slate-800/20 border border-slate-800/40 p-2.5 rounded-xl text-center">
+                For demo purposes: <code className="text-fifa-gold font-bold bg-black/10 px-1 py-0.5 rounded">{demoHint}</code>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-fifa-dark/10 rounded-xl border border-slate-700/45 overflow-hidden shadow-md">
       {/* Panel Header */}
@@ -136,9 +236,17 @@ export const StaffPanel: React.FC = () => {
           <Shield className="h-5 w-5 text-fifa-gold" />
           <span className="font-bold text-xs uppercase tracking-widest text-slate-200">Operations Command</span>
         </div>
-        <span className="bg-amber-500/10 text-amber-400 text-xs font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-widest">
-          Internal Tool
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="bg-amber-500/10 text-amber-400 text-xs font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-widest">
+            Internal Tool
+          </span>
+          <button
+            onClick={logout}
+            className="text-xs font-bold text-slate-400 hover:text-red-400 transition-colors uppercase tracking-wider"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Input area */}
@@ -190,6 +298,35 @@ export const StaffPanel: React.FC = () => {
 
       {/* Incident list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Active Emergency Alerts Section */}
+        {activeStaffAlerts.length > 0 && (
+          <div className="p-3 bg-red-950/20 border border-red-500/20 rounded-xl space-y-2 mb-2">
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              <h4 className="text-xs font-bold text-red-400 uppercase tracking-wider">Active Emergency Alerts ({activeStaffAlerts.length})</h4>
+            </div>
+            <div className="space-y-2">
+              {activeStaffAlerts.map(alert => (
+                <div key={alert.id} className="bg-red-950/30 p-2.5 rounded-lg border border-red-900/20 flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-red-300 uppercase tracking-wide flex items-center gap-1">
+                      <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                      {alert.category.toUpperCase()} :: {alert.location}
+                    </span>
+                    <span className="text-xs text-red-400">{relativeTimes[alert.id] || 'just now'}</span>
+                  </div>
+                  <p className="text-sm text-red-200 leading-relaxed font-normal bg-red-950/20 p-2 rounded border border-red-900/10">
+                    {alert.summary}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-1 select-none">
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Incident Feed</h3>
           <span className="text-xs text-slate-500 font-medium">Total: {incidents.length}</span>
