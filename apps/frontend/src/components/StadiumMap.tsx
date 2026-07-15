@@ -333,10 +333,10 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
   // Get color coding based on density
   const getDensityColor = (nodeId: string) => {
     const data = densities.find(d => d.nodeId === nodeId);
-    if (!data) return '#228557'; // default clear turf-green
-    if (data.level === 'high') return '#C93B3B'; // congested red
-    if (data.level === 'medium') return '#D99B26'; // moderate gold
-    return '#228557'; // clear turf-green
+    if (!data) return 'var(--fifa-clear)'; // default clear turf-green
+    if (data.level === 'high') return 'var(--fifa-congested)'; // congested red
+    if (data.level === 'medium') return 'var(--fifa-moderate)'; // moderate gold
+    return 'var(--fifa-clear)'; // clear turf-green
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, nodeId: string) => {
@@ -360,9 +360,9 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
 
     // Dynamic ring stroke styling for active route (No default blue)
     const ringStyle = isStart
-      ? 'stroke-[#D99B26] stroke-[3] animate-pulse'
+      ? 'stroke-[var(--fifa-moderate)] stroke-[3] animate-pulse'
       : isEnd
-      ? 'stroke-[#228557] stroke-[3] animate-bounce'
+      ? 'stroke-[var(--fifa-clear)] stroke-[3] animate-bounce'
       : isPathNode
       ? 'stroke-white stroke-[1.5]'
       : 'stroke-slate-700/60 stroke-[1]';
@@ -379,7 +379,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             height={24}
             rx={4}
             fill={nodeFill}
-            stroke={isCongested ? '#C93B3B' : undefined}
+            stroke={isCongested ? 'var(--fifa-congested)' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             tabIndex={0}
             aria-label={`Gate ${node.name}`}
@@ -392,7 +392,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
           <polygon
             points={`${node.x},${node.y - 14} ${node.x + 14},${node.y} ${node.x},${node.y + 14} ${node.x - 14},${node.y}`}
             fill={nodeFill}
-            stroke={isCongested ? '#C93B3B' : undefined}
+            stroke={isCongested ? 'var(--fifa-congested)' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             tabIndex={0}
             aria-label={`Exit ${node.name}`}
@@ -407,7 +407,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             cy={node.y}
             r={10}
             fill={nodeFill}
-            stroke={isCongested ? '#C93B3B' : undefined}
+            stroke={isCongested ? 'var(--fifa-congested)' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             tabIndex={0}
             aria-label={`Restroom ${node.name}`}
@@ -422,7 +422,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             cy={node.y}
             r={11}
             fill={nodeFill}
-            stroke={isCongested ? '#C93B3B' : undefined}
+            stroke={isCongested ? 'var(--fifa-congested)' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             tabIndex={0}
             aria-label={`Food Stall ${node.name}`}
@@ -439,7 +439,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             height={20}
             rx={3}
             fill={nodeFill}
-            stroke={isCongested ? '#C93B3B' : undefined}
+            stroke={isCongested ? 'var(--fifa-congested)' : undefined}
             className={`transition-all duration-300 ${ringStyle} ${hoverStyle}`}
             tabIndex={0}
             aria-label={`Section ${node.name}`}
@@ -465,13 +465,13 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
     }
     
     let symbol = '✓';
-    let badgeBg = '#228557'; // Turf Green Clear
+    let badgeBg = 'var(--fifa-clear)'; // Turf Green Clear
     if (level === 'medium') {
       symbol = '▲';
-      badgeBg = '#D99B26'; // Gold
+      badgeBg = 'var(--fifa-moderate)'; // Gold
     } else if (level === 'high') {
       symbol = '⚠';
-      badgeBg = '#C93B3B'; // Red
+      badgeBg = 'var(--fifa-congested)'; // Red
     }
     
     return (
@@ -568,13 +568,13 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
             `}</style>
             {/* Colorblind-Safe Diagonal Hatching Pattern for Congested Zones */}
             <pattern id="hatch-congested" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-              <rect width="10" height="10" fill="#C93B3B" fillOpacity="0.25" />
-              <line x1="0" y1="0" x2="0" y2="10" stroke="#C93B3B" strokeWidth="2.5" />
+              <rect width="10" height="10" fill="var(--fifa-congested)" fillOpacity="0.25" />
+              <line x1="0" y1="0" x2="0" y2="10" stroke="var(--fifa-congested)" strokeWidth="2.5" />
             </pattern>
           </defs>
           {/* Turf Green Soccer Pitch Center Field (Precisely Centered) */}
           {/* Outer Boundary */}
-          <rect x={185} y={205} width={130} height={90} fill="#228557" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />
+          <rect x={185} y={205} width={130} height={90} fill="var(--fifa-clear)" fillOpacity="0.4" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" rx="3" />
           {/* Center Circle & Line */}
           <circle cx={250} cy={250} r={20} fill="none" stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
           <line x1={250} y1={205} x2={250} y2={295} stroke="#F4F1EA" strokeWidth="1.5" strokeOpacity="0.25" />
@@ -642,7 +642,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     y1={fromNode.y}
                     x2={toNode.x}
                     y2={toNode.y}
-                    stroke="#D99B26"
+                    stroke="var(--fifa-moderate)"
                     strokeWidth="6"
                     strokeLinecap="round"
                     className="opacity-40 blur-[2px]"
@@ -653,7 +653,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                   y1={fromNode.y}
                   x2={toNode.x}
                   y2={toNode.y}
-                  stroke={activePath ? '#D99B26' : '#475569'}
+                  stroke={activePath ? 'var(--fifa-moderate)' : '#475569'}
                   strokeWidth={activePath ? 3.5 : 1.5}
                   strokeLinecap="round"
                   className={activePath ? 'marching-ants' : 'opacity-25'}
@@ -677,7 +677,7 @@ export const StadiumMap: React.FC<StadiumMapProps> = ({
                     cy={node.y}
                     r={isMeetupPoint ? 20 : isStart ? 18 : 15}
                     fill="none"
-                    stroke={isMeetupPoint ? '#D99B26' : isStart ? '#D99B26' : '#228557'}
+                    stroke={isMeetupPoint ? 'var(--fifa-moderate)' : isStart ? 'var(--fifa-moderate)' : 'var(--fifa-clear)'}
                     strokeWidth={isMeetupPoint ? 3.5 : 2.5}
                     className="animate-ping opacity-75"
                   />

@@ -25,15 +25,19 @@
 }
 
 [data-theme="light"] {
-  /* Light Theme */
-  --surface-base: #F8F9FC;     /* Soft warm off-white background */
-  --surface-panel: #FFFFFF;    /* White container */
-  --surface-card: #EDF0F7;     /* Light gray-blue card */
-  --surface-elevated: #E2E8F0; /* Selected state / ticker */
+  /* Light Theme - Modern SaaS Dashboard Visual Language */
+  --surface-base: #F5F9FF;     /* Base soft off-white */
+  --surface-panel: #FFFFFF;    /* Pure white container */
+  --surface-card: #FFFFFF;     /* Pure white cards */
+  --surface-elevated: #FCFDFF; /* Near-white elevated cards */
   
-  --fifa-clear: #1B6E4A;      /* Darker turf green for 4.5:1 contrast */
-  --fifa-moderate: #C07E12;   /* Darker gold for 4.5:1 contrast */
-  --fifa-congested: #B92A2A;  /* Darker red for 4.5:1 contrast */
+  --accent-primary: #3B6FE0;   /* Medium cornflower/cobalt blue */
+  --accent-secondary: #1FA97F; /* Teal/mint green */
+  --accent-dark-navy: #0D2C3E; /* DNA navy contrast */
+
+  --fifa-clear: #2E7D32;      /* Softer warm green */
+  --fifa-moderate: #C27803;   /* Softer warm amber/gold */
+  --fifa-congested: #C53030;  /* Softer warm red */
   
   --text-primary: #0F172A;    /* Slate-900 text */
   --text-secondary: #475569;  /* Slate-600 text */
@@ -55,6 +59,220 @@ body {
   font-size: var(--text-size-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* --- SaaS Light-Mode Dashboard Overrides --- */
+
+[data-theme="light"] body {
+  background-color: var(--surface-base) !important;
+  background-image: linear-gradient(135deg, #F5F9FF 0%, #EAF2FF 100%) !important;
+}
+
+/* Empty State / Hero container Wave background texture */
+[data-theme="light"] .h-full.flex.flex-col.items-center.justify-center {
+  position: relative;
+  background: radial-gradient(circle at center, rgba(59, 111, 224, 0.04) 0%, transparent 70%);
+  overflow: hidden;
+}
+
+[data-theme="light"] .h-full.flex.flex-col.items-center.justify-center::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(59, 111, 224, 0.08) 0%, rgba(31, 169, 127, 0.04) 40%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme="light"] .h-full.flex.flex-col.items-center.justify-center > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Pill-shaped buttons */
+[data-theme="light"] button,
+[data-theme="light"] [role="button"] {
+  border-radius: 9999px !important;
+}
+
+/* Restore circular dot for switch slider thumb */
+[data-theme="light"] [role="switch"] span {
+  border-radius: 50% !important;
+}
+
+/* Restore standard rounded corners for small map zoom control buttons */
+[data-theme="light"] .w-8.h-8 {
+  border-radius: 0.5rem !important;
+}
+
+/* Primary actions buttons */
+[data-theme="light"] button[type="submit"],
+[data-theme="light"] button.bg-\[\#1B6E4A\],
+[data-theme="light"] button.bg-fifa-blue,
+[data-theme="light"] .bg-\[\#1B6E4A\]:not(p):not(span):not(div) {
+  background-color: var(--accent-primary) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  transition: background-color 0.2s ease !important;
+}
+
+[data-theme="light"] button[type="submit"]:hover,
+[data-theme="light"] button.bg-\[\#1B6E4A\]:hover,
+[data-theme="light"] button.bg-fifa-blue:hover {
+  background-color: #2F5CB8 !important;
+}
+
+/* Secondary/outline buttons */
+[data-theme="light"] button.border,
+[data-theme="light"] button.border-dashed,
+[data-theme="light"] button.w-full:not(.bg-\[\#1B6E4A\]):not([type="submit"]):not(.bg-fifa-blue) {
+  background-color: #FFFFFF !important;
+  border: 1px solid rgba(59, 111, 224, 0.25) !important;
+  color: var(--accent-primary) !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-theme="light"] button.border:hover,
+[data-theme="light"] button.border-dashed:hover,
+[data-theme="light"] button.w-full:not(.bg-\[\#1B6E4A\]):hover {
+  background-color: #F0F5FF !important;
+  color: #2F5CB8 !important;
+  border-color: #2F5CB8 !important;
+}
+
+/* Cards & Panel Overrides */
+[data-theme="light"] .bg-fifa-card,
+[data-theme="light"] .bg-fifa-navy,
+[data-theme="light"] .bg-fifa-navy\/40,
+[data-theme="light"] .bg-slate-900\/40,
+[data-theme="light"] .bg-slate-800,
+[data-theme="light"] .bg-slate-800\/40,
+[data-theme="light"] .bg-fifa-navy\/20,
+[data-theme="light"] .bg-fifa-navy\/30,
+[data-theme="light"] .bg-fifa-navy\/50,
+[data-theme="light"] .bg-slate-900\/40 {
+  background-color: #FFFFFF !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 30px rgba(59, 111, 224, 0.05), 0 1px 8px rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid rgba(59, 111, 224, 0.08) !important;
+}
+
+/* Form Inputs */
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background-color: #FFFFFF !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(59, 111, 224, 0.18) !important;
+  border-radius: 12px !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.6 !important;
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] select:focus,
+[data-theme="light"] textarea:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 3px rgba(59, 111, 224, 0.15) !important;
+  outline: none !important;
+}
+
+/* Contrast Header and Route Summary Card */
+[data-theme="light"] header {
+  background-color: var(--accent-dark-navy) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="light"] header h1 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] header span {
+  color: var(--fifa-moderate) !important;
+}
+
+[data-theme="light"] header button {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] header button:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] .border-l-fifa-gold {
+  background-color: var(--accent-dark-navy) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-left: 4px solid var(--fifa-moderate) !important;
+  box-shadow: 0 10px 25px -5px rgba(13, 44, 62, 0.25) !important;
+}
+
+[data-theme="light"] .border-l-fifa-gold span:not(.text-fifa-gold) {
+  color: #E2E8F0 !important;
+}
+
+[data-theme="light"] .border-l-fifa-gold span.text-slate-100 {
+  color: #FFFFFF !important;
+}
+
+/* Active tab underline styling */
+[data-theme="light"] .border-fifa-clear {
+  border-color: var(--accent-primary) !important;
+}
+
+[data-theme="light"] .text-slate-100 {
+  color: var(--accent-primary) !important;
+}
+
+/* Text color contrast adaptations */
+[data-theme="light"] .text-\[\#E8E6E0\] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .text-slate-300,
+[data-theme="light"] .text-slate-400,
+[data-theme="light"] .text-slate-500 {
+  color: var(--text-secondary) !important;
+}
+
+/* User chat bubble accent adaptation */
+[data-theme="light"] .bg-\[\#1B6E4A\]:not(button):not(span) {
+  background-color: var(--accent-primary) !important;
+  color: #FFFFFF !important;
+}
+
+/* Standing icons soft colored circles */
+[data-theme="light"] svg.lucide:not(.marching-ants):not(button svg):not(.w-14 svg):not(.w-4 svg):not(select + svg) {
+  background-color: rgba(59, 111, 224, 0.08) !important;
+  color: var(--accent-primary) !important;
+  padding: 0.35rem;
+  border-radius: 9999px;
+  box-sizing: content-box;
+}
+
+[data-theme="light"] svg.lucide-heart:not(button svg),
+[data-theme="light"] svg.lucide-wrench:not(button svg) {
+  background-color: rgba(31, 169, 127, 0.08) !important;
+  color: var(--accent-secondary) !important;
+}
+
+[data-theme="light"] .w-14.h-14.rounded-full {
+  background-color: rgba(59, 111, 224, 0.08) !important;
+  border-color: rgba(59, 111, 224, 0.15) !important;
+}
+
+[data-theme="light"] .w-14.h-14.rounded-full svg {
+  color: var(--accent-primary) !important;
+  background: transparent !important;
+  padding: 0 !important;
 }
 
 .uppercase,
