@@ -5,21 +5,9 @@ import crypto from 'crypto';
 
 const router = Router();
 
-// In-memory store for staff tokens: token -> expiresAt (timestamp)
-const staffSessions = new Map<string, number>();
-
-// Cleanup expired sessions periodically (every 1 hour)
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, expiresAt] of staffSessions.entries()) {
-    if (expiresAt < now) {
-      staffSessions.delete(token);
-    }
-  }
-}, 60 * 60 * 1000);
-
 /**
  * Middleware to verify staff access token passed via Authorization: Bearer <token>
+ * Uses stateless signature validation so it works correctly on ephemeral/serverless environments like Vercel.
  */
 export function verifyStaffToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
@@ -28,15 +16,31 @@ export function verifyStaffToken(req: Request, res: Response, next: NextFunction
   }
 
   const token = authHeader.slice(7).trim();
-  const expiresAt = staffSessions.get(token);
+  const parts = token.split('.');
+  if (parts.length !== 2) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid token structure' });
+  }
 
-  if (!expiresAt) {
-    return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  const [payload, signature] = parts;
+  const expiresAt = parseInt(payload, 10);
+
+  if (isNaN(expiresAt)) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid token payload' });
   }
 
   if (expiresAt < Date.now()) {
-    staffSessions.delete(token);
     return res.status(401).json({ error: 'Unauthorized: Token expired' });
+  }
+
+  const secret = process.env.STAFF_TOKEN_SECRET || 'super-secret-token-key';
+  const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+
+  // Compare signatures timing-safely to prevent timing attacks
+  const expectedBuf = Buffer.from(expectedSignature, 'hex');
+  const actualBuf = Buffer.from(signature, 'hex');
+
+  if (expectedBuf.length !== actualBuf.length || !crypto.timingSafeEqual(expectedBuf, actualBuf)) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid signature' });
   }
 
   next();
@@ -45,7 +49,7 @@ export function verifyStaffToken(req: Request, res: Response, next: NextFunction
 /**
  * POST /api/staff/auth
  * Expects { code: string } in body.
- * Verifies staff access code with constant-time comparison and returns a session token.
+ * Verifies staff access code with constant-time comparison and returns a stateless signed token.
  */
 router.post('/auth', (req: Request, res: Response) => {
   try {
@@ -65,12 +69,12 @@ router.post('/auth', (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Incorrect passcode' });
     }
 
-    // Generate random session token
-    const token = crypto.randomBytes(32).toString('hex');
+    // Generate a stateless signed token containing expiresAt and an HMAC signature of it
     const expiresIn = 4 * 60 * 60; // 4 hours in seconds
     const expiresAt = Date.now() + expiresIn * 1000;
-
-    staffSessions.set(token, expiresAt);
+    const payload = expiresAt.toString();
+    const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    const token = `${payload}.${signature}`;
 
     return res.json({ token, expiresIn });
   } catch (error) {

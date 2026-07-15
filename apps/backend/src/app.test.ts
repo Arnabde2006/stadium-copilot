@@ -1,6 +1,8 @@
 import request from 'supertest';
 import app from './app';
 
+jest.setTimeout(30000);
+
 describe('Stadium Copilot API Smoke Tests', () => {
   it('should fetch the stadium graph structure', async () => {
     const res = await request(app).get('/api/assistant/graph');

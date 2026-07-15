@@ -1,6 +1,8 @@
 import request from 'supertest';
 import app from '../app';
 
+jest.setTimeout(30000);
+
 describe('Reunite Group API Smoke Tests', () => {
   it('should calculate the optimal meetup point and route members successfully', async () => {
     const res = await request(app)

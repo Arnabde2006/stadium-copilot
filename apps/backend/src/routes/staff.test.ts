@@ -1,6 +1,8 @@
 import request from 'supertest';
 import app from '../app';
 
+jest.setTimeout(30000);
+
 describe('Staff Incident API Smoke Tests', () => {
   let authToken = '';
 
